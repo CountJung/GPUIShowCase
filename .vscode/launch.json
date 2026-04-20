@@ -1,0 +1,68 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Desktop: GPUIShowCase",
+      "type": "lldb",
+      "request": "launch",
+      "cargo": {
+        "args": [
+          "build",
+          "--bin",
+          "gpuishowcase",
+          "--target-dir",
+          "target-agent"
+        ],
+        "filter": {
+          "name": "gpuishowcase",
+          "kind": "bin"
+        }
+      },
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "RUST_BACKTRACE": "1"
+      },
+      "args": [],
+      "sourceLanguages": [
+        "rust"
+      ]
+    },
+    {
+      "name": "Desktop: Logs Route",
+      "type": "lldb",
+      "request": "launch",
+      "cargo": {
+        "args": [
+          "build",
+          "--bin",
+          "gpuishowcase",
+          "--target-dir",
+          "target-agent"
+        ],
+        "filter": {
+          "name": "gpuishowcase",
+          "kind": "bin"
+        }
+      },
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "RUST_BACKTRACE": "1"
+      },
+      "args": [
+        "--route",
+        "logs"
+      ],
+      "sourceLanguages": [
+        "rust"
+      ]
+    },
+    {
+      "name": "Web Mode: Browser",
+      "type": "pwa-chrome",
+      "request": "launch",
+      "url": "http://127.0.0.1:4173",
+      "webRoot": "${workspaceFolder}/web",
+      "preLaunchTask": "web-mode-serve"
+    }
+  ]
+}

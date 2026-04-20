@@ -1,0 +1,72 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "desktop-build",
+      "type": "shell",
+      "command": "cargo",
+      "args": [
+        "build",
+        "--bin",
+        "gpuishowcase",
+        "--target-dir",
+        "target-agent"
+      ],
+      "problemMatcher": [
+        "$rustc"
+      ],
+      "group": "build"
+    },
+    {
+      "label": "desktop-run-logs",
+      "type": "shell",
+      "command": "bash",
+      "args": [
+        "scripts/run-desktop.sh",
+        "--route",
+        "logs"
+      ],
+      "windows": {
+        "command": "pwsh",
+        "args": [
+          "-NoProfile",
+          "-ExecutionPolicy",
+          "Bypass",
+          "-File",
+          "scripts/run-desktop.ps1",
+          "-Route",
+          "logs"
+        ]
+      },
+      "problemMatcher": [
+        "$rustc"
+      ]
+    },
+    {
+      "label": "web-mode-serve",
+      "type": "shell",
+      "command": "bash",
+      "args": [
+        "scripts/run-web-mode.sh"
+      ],
+      "windows": {
+        "command": "pwsh",
+        "args": [
+          "-NoProfile",
+          "-ExecutionPolicy",
+          "Bypass",
+          "-File",
+          "scripts/run-web-mode.ps1"
+        ]
+      },
+      "isBackground": true,
+      "problemMatcher": {
+        "base": "$rustc",
+        "background": {
+          "activeOnStart": true,
+          "endsPattern": "Listening on http://127\\.0\\.0\\.1:4173"
+        }
+      }
+    }
+  ]
+}

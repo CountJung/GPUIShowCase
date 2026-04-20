@@ -1,0 +1,31 @@
+# Rust build artifacts
+/target/
+debug/
+release/
+
+# Logs and runtime output
+/logs/
+*.log
+
+# Local environment and secrets
+.env
+.env.*
+
+# Editor and OS files
+.idea/
+.vs/
+.zed/
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.orig
+
+# Coverage and profiling artifacts
+*.profraw
+*.profdata
+coverage/

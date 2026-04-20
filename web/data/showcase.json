@@ -1,0 +1,127 @@
+{
+  "name": "GPUIShowCase",
+  "summary": "네이티브 GPUI 앱을 주 런타임으로 유지하면서, 브라우저에서는 구조와 검증 상태, 디버그 진입점을 독립적으로 확인할 수 있는 companion web mode입니다.",
+  "metrics": [
+    {
+      "label": "Phases",
+      "value": "10",
+      "note": "0부터 9까지 문서와 구현 정리 완료"
+    },
+    {
+      "label": "Harness",
+      "value": "11",
+      "note": "web mode 독립 검증 경로 포함"
+    },
+    {
+      "label": "Routes",
+      "value": "6",
+      "note": "native desktop 기준 Dashboard부터 Logs까지 유지"
+    }
+  ],
+  "routes": [
+    {
+      "title": "Dashboard",
+      "summary": "시스템 정보, 테마, 렌더링 성능 baseline 요약",
+      "meta": ["native", "summary", "cards"],
+      "status": "active",
+      "statusClass": "verified"
+    },
+    {
+      "title": "Components",
+      "summary": "카테고리 선택과 Preview / Code Preview / Props Panel 동기화",
+      "meta": ["registry", "preview", "props"],
+      "status": "active",
+      "statusClass": "verified"
+    },
+    {
+      "title": "Playground",
+      "summary": "이벤트 로그와 상태 변화 추적을 동시에 보여주는 실험 화면",
+      "meta": ["state trace", "events", "interaction"],
+      "status": "active",
+      "statusClass": "verified"
+    },
+    {
+      "title": "Data Showcase",
+      "summary": "공통 운영 데이터셋 기반 표, 차트, 파일 탐색형 리스트",
+      "meta": ["shared dataset", "trend", "capacity"],
+      "status": "active",
+      "statusClass": "verified"
+    },
+    {
+      "title": "Settings",
+      "summary": "theme, log level, layout density, performance mode를 UI에서 직접 변경",
+      "meta": ["settings", "theme", "runtime"],
+      "status": "active",
+      "statusClass": "verified"
+    },
+    {
+      "title": "Logs",
+      "summary": "rolling file logging과 in-app UI log surface를 동시에 노출",
+      "meta": ["file logging", "ui logs", "diagnostics"],
+      "status": "active",
+      "statusClass": "verified"
+    }
+  ],
+  "harnesses": [
+    {
+      "title": "HM-001 ~ HM-010",
+      "summary": "native desktop bootstrap, layout, state, feature, logging, performance 경로가 PASS 상태로 유지됩니다.",
+      "meta": ["docs/harness-map.md", "native app", "pass"],
+      "status": "PASS",
+      "statusClass": "pass"
+    },
+    {
+      "title": "HM-011 Web Mode",
+      "summary": "independent web mode server boot, /health, browser render를 별도 경로로 검증합니다.",
+      "meta": ["web mode", "browser", "static server"],
+      "status": "PASS",
+      "statusClass": "pass"
+    }
+  ],
+  "targets": [
+    {
+      "title": "Windows",
+      "summary": "현재 workspace에서 native build/run과 logging 검증을 직접 수행했습니다.",
+      "meta": ["validated", "local runtime", "VS Code task"],
+      "status": "verified",
+      "statusClass": "verified"
+    },
+    {
+      "title": "Linux",
+      "summary": "script와 task는 제공하지만, 이 Windows 환경에서는 런타임 smoke를 실행하지 못했습니다.",
+      "meta": ["reviewed", "bash script", "deferred smoke"],
+      "status": "review",
+      "statusClass": "review"
+    },
+    {
+      "title": "macOS",
+      "summary": "script와 task는 제공하지만, Xcode/Metal 준비가 필요한 native smoke는 별도 환경에서 재검증해야 합니다.",
+      "meta": ["reviewed", "bash script", "deferred smoke"],
+      "status": "review",
+      "statusClass": "review"
+    }
+  ],
+  "debugProfiles": [
+    {
+      "title": "Desktop: GPUIShowCase",
+      "summary": "CodeLLDB 기반 cross-platform Rust launch configuration",
+      "meta": ["lldb", "target-agent", "native"],
+      "status": "ready",
+      "statusClass": "verified"
+    },
+    {
+      "title": "Desktop: Logs Route",
+      "summary": "로그 화면과 rolling log surface를 바로 디버깅하기 위한 native profile",
+      "meta": ["lldb", "logs route", "diagnostics"],
+      "status": "ready",
+      "statusClass": "verified"
+    },
+    {
+      "title": "Web Mode: Browser",
+      "summary": "background Rust server task와 Chromium debugger를 결합한 browser profile",
+      "meta": ["pwa-chrome", "preLaunchTask", "independent"],
+      "status": "ready",
+      "statusClass": "verified"
+    }
+  ]
+}

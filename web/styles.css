@@ -1,0 +1,250 @@
+:root {
+  --bg: #f1eee7;
+  --panel: rgba(250, 248, 243, 0.86);
+  --panel-strong: rgba(255, 252, 246, 0.94);
+  --line: rgba(56, 54, 49, 0.14);
+  --text: #1e1d1a;
+  --muted: #5f5a50;
+  --accent: #0f766e;
+  --accent-soft: #d1fae5;
+  --warning: #b45309;
+  --done: #166534;
+  --shadow: 0 24px 80px rgba(45, 43, 37, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  font-family: "Aptos", "Segoe UI Variable Text", "Noto Sans KR", sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(15, 118, 110, 0.12), transparent 30%),
+    radial-gradient(circle at bottom right, rgba(180, 83, 9, 0.14), transparent 28%),
+    var(--bg);
+  color: var(--text);
+}
+
+body {
+  position: relative;
+  overflow-x: hidden;
+}
+
+.ambient {
+  position: fixed;
+  border-radius: 999px;
+  filter: blur(18px);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.ambient-a {
+  width: 18rem;
+  height: 18rem;
+  background: rgba(20, 184, 166, 0.14);
+  top: -5rem;
+  right: 8rem;
+}
+
+.ambient-b {
+  width: 24rem;
+  height: 24rem;
+  background: rgba(249, 115, 22, 0.12);
+  bottom: -8rem;
+  left: -3rem;
+}
+
+.shell {
+  width: min(1180px, calc(100vw - 2rem));
+  margin: 0 auto;
+  padding: 2rem 0 3rem;
+}
+
+.hero,
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(10px);
+}
+
+.hero {
+  padding: 2rem;
+  margin-bottom: 1.25rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.hero-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.hero h1,
+.panel h2 {
+  margin: 0;
+  font-family: "Bahnschrift", "Aptos Display", "Segoe UI Variable Display", sans-serif;
+  letter-spacing: -0.04em;
+}
+
+.hero h1 {
+  font-size: clamp(2.2rem, 5vw, 4.4rem);
+}
+
+.hero p,
+.meta-chip,
+.entry-subtext,
+.status-badge,
+.panel p {
+  color: var(--muted);
+}
+
+.hero-summary {
+  max-width: 42rem;
+  line-height: 1.6;
+}
+
+.hero-metrics,
+.grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.hero-metrics {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.metric-card,
+.entry-card {
+  background: var(--panel-strong);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 1rem;
+}
+
+.metric-value {
+  font-size: 1.9rem;
+  font-weight: 700;
+  margin-top: 0.4rem;
+}
+
+.two-up {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: 1rem;
+}
+
+.panel {
+  padding: 1.25rem;
+}
+
+.panel-tall {
+  min-height: 28rem;
+}
+
+.panel-header {
+  margin-bottom: 1rem;
+}
+
+.eyebrow {
+  display: inline-block;
+  margin-bottom: 0.4rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.route-list,
+.harness-list,
+.target-list,
+.debug-list {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.entry-card {
+  display: grid;
+  gap: 0.45rem;
+  animation: rise 420ms ease both;
+}
+
+.entry-title-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.8rem;
+  align-items: flex-start;
+}
+
+.entry-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.status-badge {
+  justify-self: start;
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.status-badge.pass,
+.status-badge.verified {
+  background: rgba(22, 101, 52, 0.12);
+  color: var(--done);
+}
+
+.status-badge.review,
+.status-badge.pending {
+  background: rgba(180, 83, 9, 0.12);
+  color: var(--warning);
+}
+
+.meta-chip-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.meta-chip {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.26rem 0.65rem;
+  font-size: 0.78rem;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 860px) {
+  .two-up {
+    grid-template-columns: 1fr;
+  }
+
+  .shell {
+    width: min(100vw - 1rem, 100%);
+    padding: 0.75rem 0 2rem;
+  }
+
+  .hero,
+  .panel {
+    border-radius: 22px;
+  }
+}

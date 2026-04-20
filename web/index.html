@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GPUIShowCase Web Mode</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="ambient ambient-a"></div>
+  <div class="ambient ambient-b"></div>
+  <main class="shell">
+    <section class="hero" id="hero"></section>
+    <section class="grid two-up">
+      <article class="panel panel-tall">
+        <div class="panel-header">
+          <span class="eyebrow">Feature Surfaces</span>
+          <h2>Routes</h2>
+        </div>
+        <div class="route-list" id="route-list"></div>
+      </article>
+      <article class="panel">
+        <div class="panel-header">
+          <span class="eyebrow">Verification</span>
+          <h2>Harness Snapshot</h2>
+        </div>
+        <div class="harness-list" id="harness-list"></div>
+      </article>
+    </section>
+    <section class="grid two-up">
+      <article class="panel">
+        <div class="panel-header">
+          <span class="eyebrow">Platforms</span>
+          <h2>Native Review</h2>
+        </div>
+        <div class="target-list" id="target-list"></div>
+      </article>
+      <article class="panel">
+        <div class="panel-header">
+          <span class="eyebrow">Debug Paths</span>
+          <h2>Launch Profiles</h2>
+        </div>
+        <div class="debug-list" id="debug-list"></div>
+      </article>
+    </section>
+  </main>
+  <script src="/app.js" type="module"></script>
+</body>
+</html>
