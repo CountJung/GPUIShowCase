@@ -21,12 +21,12 @@
 - Build: `cargo check`
 - Lint: `cargo clippy --all-targets --all-features -- -D warnings`
 - Test: `cargo test`
-- Manual UI check: current phase harness entries
+- Manual UI check: current phase project map entries
 
 ## Evidence Rules
 
 - 실행한 명령과 결과는 문서 또는 작업 기록에 남긴다.
-- 하네스 맵에는 최소한 상태와 증거 위치를 남긴다.
+- 프로젝트 맵에는 최소한 상태와 증거 위치를 남긴다.
 - 우회가 있으면 이유, 리스크, 제거 조건을 명시한다.
 - 문서와 명령 예시가 바뀌면 같은 단계 안에서 원본 문서를 갱신한다.
 

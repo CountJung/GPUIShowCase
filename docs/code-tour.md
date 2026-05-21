@@ -49,6 +49,6 @@
 
 1. `docs/master-plan.md`
 2. `todolist.md`
-3. `docs/harness-map.md`
+3. `docs/project-map.md`
 4. `docs/testing-strategy.md`
 5. `docs/backlog.md`

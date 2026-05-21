@@ -14,7 +14,7 @@
 
 - `docs/master-plan.md`
 - `docs/implementation-history.md`
-- `docs/harness-map.md`
+- `docs/project-map.md`
 - `docs/testing-strategy.md`
 - `docs/code-tour.md`
 - `docs/backlog.md`
@@ -26,14 +26,14 @@
 - [x] `cargo check`
 - [x] `cargo clippy --all-targets --all-features -- -D warnings`
 - [x] `cargo test`
-- [x] web mode smoke and current harness review
+- [x] web mode smoke and current project map review
 
 ## Current Completion Matrix
 
 | 영역 | 상태 | 기준 문서 |
 | --- | --- | --- |
 | Native app shell and routes | DONE | `docs/master-plan.md` |
-| Logging and settings | DONE | `docs/harness-map.md` |
+| Logging and settings | DONE | `docs/project-map.md` |
 | Quality and testing docs | DONE | `docs/testing-strategy.md`, `quality/` |
 | VS Code debugging setup | DONE | `docs/debugging.md`, `.vscode/` |
 | Independent web mode | DONE | `docs/debugging.md`, `web/`, `src/bin/web_mode.rs` |
@@ -52,4 +52,4 @@
 
 ## Re-entry Rule
 
-- 새 기능을 추가할 때는 이 문서에 phase를 다시 늘리지 않고, `docs/master-plan.md`와 `docs/backlog.md`, `docs/harness-map.md`를 먼저 갱신한다.
+- 새 기능을 추가할 때는 이 문서에 phase를 다시 늘리지 않고, `docs/master-plan.md`와 `docs/backlog.md`, `docs/project-map.md`를 먼저 갱신한다.

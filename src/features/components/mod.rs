@@ -113,6 +113,7 @@ fn render_preview_widget(component_id: ComponentId) -> AnyElement {
         alert::Alert,
         avatar::Avatar,
         radio::Radio,
+        scroll::ScrollableElement as _,
         skeleton::Skeleton,
         spinner::Spinner,
         switch::Switch,
@@ -213,7 +214,7 @@ fn render_preview_widget(component_id: ComponentId) -> AnyElement {
             .child(Button::new("toggle-on").outline().selected(true).label("Active"))
             .child(Button::new("toggle-off").outline().selected(false).label("Inactive"))
             .into_any_element(),
-        ComponentId::Input | ComponentId::NumberInput | ComponentId::OtpInput => div()
+        ComponentId::Input | ComponentId::NumberInput => div()
             .v_flex()
             .gap_2()
             .child(
@@ -226,6 +227,16 @@ fn render_preview_widget(component_id: ComponentId) -> AnyElement {
                     .child("Search components…"),
             )
             .child(format!("{} — Entity<InputState> 바인딩 필요", component_id.title()))
+            .into_any_element(),
+        ComponentId::OtpInput => div()
+            .h_flex()
+            .gap_2()
+            .child(preview_otp_box("4"))
+            .child(preview_otp_box("8"))
+            .child(preview_otp_box("2"))
+            .child(preview_otp_box(" "))
+            .child(preview_otp_box(" "))
+            .child(preview_otp_box(" "))
             .into_any_element(),
         ComponentId::Editor => div()
             .v_flex()
@@ -243,7 +254,7 @@ fn render_preview_widget(component_id: ComponentId) -> AnyElement {
             )
             .child("실제 Editor는 Entity<InputState> 바인딩이 필요합니다.")
             .into_any_element(),
-        ComponentId::Dialog | ComponentId::AlertDialog | ComponentId::Sheet => div()
+        ComponentId::Dialog | ComponentId::AlertDialog => div()
             .v_flex()
             .gap_2()
             .child(Button::new("preview-dialog-trigger").outline().label("Open Dialog"))
@@ -263,6 +274,20 @@ fn render_preview_widget(component_id: ComponentId) -> AnyElement {
                             .child(Button::new("preview-dialog-cancel").outline().label("취소"))
                             .child(Button::new("preview-dialog-ok").outline().label("확인")),
                     ),
+            )
+            .into_any_element(),
+        ComponentId::Sheet => div()
+            .v_flex()
+            .gap_2()
+            .child(div().font_weight(FontWeight::SEMIBOLD).child("Sheet Preview"))
+            .child(
+                div()
+                    .border_l_4()
+                    .pl_3()
+                    .v_flex()
+                    .gap_1()
+                    .child("오른쪽에서 슬라이드로 열리는 드로어 패널입니다.")
+                    .child("닫기 버튼 또는 배경 클릭으로 닫힙니다."),
             )
             .into_any_element(),
         ComponentId::Sidebar => div()
@@ -325,25 +350,682 @@ fn render_preview_widget(component_id: ComponentId) -> AnyElement {
             )
             .child(div().border_t_1().p_2().child("Drag handle between panels"))
             .into_any_element(),
-        _ => div()
+        ComponentId::Accordion | ComponentId::CollapsibleWidget => div()
             .v_flex()
             .gap_1()
-            .p_3()
+            .w_full()
+            .child(accordion_item("Introduction", true, "gpui-component는 GPUI 위에서 실행되는 UI 컴포넌트 라이브러리입니다."))
+            .child(accordion_item("Installation", false, "Cargo.toml 에 gpui-component = \"0.5\" 를 추가하세요."))
+            .child(accordion_item("Usage", false, "use gpui_component::button::Button;"))
+            .into_any_element(),
+        ComponentId::Pagination => div()
+            .h_flex()
+            .gap_1()
+            .items_center()
+            .child(preview_page_btn("‹", false))
+            .child(preview_page_btn("1", false))
+            .child(preview_page_btn("2", true))
+            .child(preview_page_btn("3", false))
+            .child(preview_page_btn("4", false))
+            .child(preview_page_btn("5", false))
+            .child(preview_page_btn("›", false))
+            .into_any_element(),
+        ComponentId::Stepper => div()
+            .v_flex()
+            .gap_3()
+            .child(
+                div()
+                    .h_flex()
+                    .gap_2()
+                    .items_center()
+                    .child(preview_step_dot(true, "1"))
+                    .child(div().flex_1().h(px(2.0)).border_t_1())
+                    .child(preview_step_dot(true, "2"))
+                    .child(div().flex_1().h(px(2.0)).border_t_1())
+                    .child(preview_step_dot(false, "3"))
+                    .child(div().flex_1().h(px(2.0)).border_t_1())
+                    .child(preview_step_dot(false, "4")),
+            )
+            .child(
+                div()
+                    .h_flex()
+                    .child(div().flex_1().text_xs().child("Info"))
+                    .child(div().flex_1().text_xs().child("Details"))
+                    .child(div().flex_1().text_xs().child("Review"))
+                    .child(div().flex_1().text_xs().child("Done")),
+            )
+            .into_any_element(),
+        ComponentId::Rating => div()
+            .v_flex()
+            .gap_2()
+            .child(
+                div()
+                    .h_flex()
+                    .gap_1()
+                    .child(preview_star(true))
+                    .child(preview_star(true))
+                    .child(preview_star(true))
+                    .child(preview_star(true))
+                    .child(preview_star(false)),
+            )
+            .child(div().text_sm().child("4 / 5 stars"))
+            .into_any_element(),
+        ComponentId::Slider => div()
+            .v_flex()
+            .gap_3()
+            .child(preview_slider(60.0))
+            .child(preview_slider(30.0))
+            .child(preview_slider(80.0))
+            .into_any_element(),
+        ComponentId::Select => div()
+            .v_flex()
+            .gap_2()
+            .child(
+                div()
+                    .h_flex()
+                    .gap_2()
+                    .items_center()
+                    .px_3()
+                    .py_2()
+                    .border_1()
+                    .rounded(px(6.0))
+                    .w_full()
+                    .child(div().flex_1().child("Option B"))
+                    .child(div().child("▾")),
+            )
+            .child(
+                div()
+                    .v_flex()
+                    .border_1()
+                    .rounded(px(6.0))
+                    .overflow_hidden()
+                    .child(preview_select_option("Option A", false))
+                    .child(preview_select_option("Option B", true))
+                    .child(preview_select_option("Option C", false)),
+            )
+            .into_any_element(),
+        ComponentId::DatePicker => div()
+            .v_flex()
+            .gap_2()
+            .child(
+                div()
+                    .h_flex()
+                    .gap_2()
+                    .items_center()
+                    .px_3()
+                    .py_2()
+                    .border_1()
+                    .rounded(px(6.0))
+                    .child(div().child("📅"))
+                    .child(div().flex_1().child("2026-04-20")),
+            )
+            .child(
+                div()
+                    .p_2()
+                    .border_1()
+                    .rounded(px(6.0))
+                    .v_flex()
+                    .gap_1()
+                    .child(div().h_flex().gap_1().child(div().flex_1().text_xs().child("Mo")).child(div().flex_1().text_xs().child("Tu")).child(div().flex_1().text_xs().child("We")).child(div().flex_1().text_xs().child("Th")).child(div().flex_1().text_xs().child("Fr")))
+                    .child(div().h_flex().gap_1().child(preview_cal_day("14", false)).child(preview_cal_day("15", false)).child(preview_cal_day("16", false)).child(preview_cal_day("17", false)).child(preview_cal_day("18", false)))
+                    .child(div().h_flex().gap_1().child(preview_cal_day("19", false)).child(preview_cal_day("20", true)).child(preview_cal_day("21", false)).child(preview_cal_day("22", false)).child(preview_cal_day("23", false))),
+            )
+            .into_any_element(),
+        ComponentId::ColorPicker => div()
+            .v_flex()
+            .gap_2()
+            .child(
+                div()
+                    .h_flex()
+                    .gap_2()
+                    .child(div().w(px(32.0)).h(px(32.0)).rounded_full().bg(rgba(0x6366f1ff)))
+                    .child(
+                        div()
+                            .h_flex()
+                            .gap_1()
+                            .child(color_swatch(rgba(0xef4444ff)))
+                            .child(color_swatch(rgba(0xf97316ff)))
+                            .child(color_swatch(rgba(0xeab308ff)))
+                            .child(color_swatch(rgba(0x22c55eff)))
+                            .child(color_swatch(rgba(0x3b82f6ff)))
+                            .child(color_swatch(rgba(0x8b5cf6ff)))
+                            .child(color_swatch(rgba(0xec4899ff))),
+                    ),
+            )
+            .child(div().text_sm().child("#6366f1"))
+            .into_any_element(),
+        ComponentId::HoverCard | ComponentId::Tooltip => div()
+            .v_flex()
+            .gap_3()
+            .child(
+                div()
+                    .px_3()
+                    .py_2()
+                    .border_1()
+                    .rounded(px(6.0))
+                    .child("Hover me"),
+            )
+            .child(
+                div()
+                    .p_3()
+                    .border_1()
+                    .rounded(px(8.0))
+                    .v_flex()
+                    .gap_1()
+                    .child(div().font_weight(FontWeight::SEMIBOLD).child("Additional Info"))
+                    .child("마우스를 올리면 이 카드가 나타납니다.")
+                    .child(div().text_xs().child("HoverCard / Tooltip 컴포넌트")),
+            )
+            .into_any_element(),
+        ComponentId::Notification => div()
+            .v_flex()
+            .gap_2()
+            .child(preview_toast("success", "✓ 파일이 저장되었습니다.", "방금 전"))
+            .child(preview_toast("info", "ℹ 업데이트가 있습니다.", "1분 전"))
+            .child(preview_toast("warning", "⚠ 저장 공간이 부족합니다.", "5분 전"))
+            .into_any_element(),
+        ComponentId::Popover => div()
+            .v_flex()
+            .gap_2()
+            .child(
+                div()
+                    .h_flex()
+                    .gap_2()
+                    .child(Button::new("preview-popover-btn").outline().label("Open Popover"))
+                    .child(div().text_sm().child("← 클릭 시 팝오버 열림")),
+            )
+            .child(
+                div()
+                    .p_3()
+                    .border_1()
+                    .rounded(px(8.0))
+                    .v_flex()
+                    .gap_2()
+                    .child(div().font_weight(FontWeight::SEMIBOLD).child("Popover Content"))
+                    .child("버튼 근처에 부유하여 표시됩니다.")
+                    .child(Button::new("preview-popover-close").outline().label("닫기")),
+            )
+            .into_any_element(),
+        ComponentId::Menu => div()
+            .v_flex()
+            .gap_px()
             .border_1()
-            .rounded(px(10.0))
-            .child(format!("{} preview", component_id.title()))
-            .child("실제 상호작용 프리뷰는 후속 단계에서 연결됩니다.")
+            .rounded(px(6.0))
+            .overflow_hidden()
+            .child(preview_menu_item("✂  Cut", "Ctrl+X", false))
+            .child(preview_menu_item("⎘  Copy", "Ctrl+C", false))
+            .child(preview_menu_item("⎇  Paste", "Ctrl+V", false))
+            .child(div().border_t_1().h(px(1.0)))
+            .child(preview_menu_item("🗑  Delete", "Del", false))
+            .child(preview_menu_item("✎  Rename", "F2", true))
+            .into_any_element(),
+        ComponentId::Tabs => div()
+            .v_flex()
+            .gap_0()
+            .border_1()
+            .rounded(px(8.0))
+            .overflow_hidden()
+            .child(
+                div()
+                    .h_flex()
+                    .border_b_1()
+                    .child(preview_tab("Overview", true))
+                    .child(preview_tab("Details", false))
+                    .child(preview_tab("Settings", false))
+                    .child(preview_tab("Logs", false)),
+            )
+            .child(
+                div()
+                    .p_3()
+                    .v_flex()
+                    .gap_2()
+                    .child(div().font_weight(FontWeight::SEMIBOLD).child("Overview Panel"))
+                    .child("Overview 탭이 선택된 상태입니다. 탭을 클릭하면 패널이 전환됩니다."),
+            )
+            .into_any_element(),
+        ComponentId::Tree => div()
+            .v_flex()
+            .gap_px()
+            .border_1()
+            .rounded(px(6.0))
+            .overflow_hidden()
+            .child(preview_tree_node("📁 src", 0, true))
+            .child(preview_tree_node("📁 app", 1, true))
+            .child(preview_tree_node("📄 root.rs", 2, false))
+            .child(preview_tree_node("📄 mod.rs", 2, false))
+            .child(preview_tree_node("📁 features", 1, true))
+            .child(preview_tree_node("📄 mod.rs", 2, false))
+            .child(preview_tree_node("📄 Cargo.toml", 0, false))
+            .into_any_element(),
+        ComponentId::Calendar => div()
+            .v_flex()
+            .gap_2()
+            .child(
+                div()
+                    .h_flex()
+                    .items_center()
+                    .child(Button::new("cal-prev").outline().label("‹"))
+                    .child(div().flex_1().text_center().font_weight(FontWeight::SEMIBOLD).child("April 2026"))
+                    .child(Button::new("cal-next").outline().label("›")),
+            )
+            .child(
+                div()
+                    .v_flex()
+                    .gap_1()
+                    .child(
+                        div()
+                            .h_flex()
+                            .child(preview_cal_header("Sun"))
+                            .child(preview_cal_header("Mon"))
+                            .child(preview_cal_header("Tue"))
+                            .child(preview_cal_header("Wed"))
+                            .child(preview_cal_header("Thu"))
+                            .child(preview_cal_header("Fri"))
+                            .child(preview_cal_header("Sat")),
+                    )
+                    .child(
+                        div()
+                            .h_flex()
+                            .child(preview_cal_day_full("", false))
+                            .child(preview_cal_day_full("", false))
+                            .child(preview_cal_day_full("1", false))
+                            .child(preview_cal_day_full("2", false))
+                            .child(preview_cal_day_full("3", false))
+                            .child(preview_cal_day_full("4", false))
+                            .child(preview_cal_day_full("5", false)),
+                    )
+                    .child(
+                        div()
+                            .h_flex()
+                            .child(preview_cal_day_full("6", false))
+                            .child(preview_cal_day_full("7", false))
+                            .child(preview_cal_day_full("8", false))
+                            .child(preview_cal_day_full("9", false))
+                            .child(preview_cal_day_full("10", false))
+                            .child(preview_cal_day_full("11", false))
+                            .child(preview_cal_day_full("12", false)),
+                    )
+                    .child(
+                        div()
+                            .h_flex()
+                            .child(preview_cal_day_full("13", false))
+                            .child(preview_cal_day_full("14", false))
+                            .child(preview_cal_day_full("15", false))
+                            .child(preview_cal_day_full("16", false))
+                            .child(preview_cal_day_full("17", false))
+                            .child(preview_cal_day_full("18", false))
+                            .child(preview_cal_day_full("19", false)),
+                    )
+                    .child(
+                        div()
+                            .h_flex()
+                            .child(preview_cal_day_full("20", true))
+                            .child(preview_cal_day_full("21", false))
+                            .child(preview_cal_day_full("22", false))
+                            .child(preview_cal_day_full("23", false))
+                            .child(preview_cal_day_full("24", false))
+                            .child(preview_cal_day_full("25", false))
+                            .child(preview_cal_day_full("26", false)),
+                    ),
+            )
+            .into_any_element(),
+        ComponentId::DescriptionList => div()
+            .v_flex()
+            .gap_1()
+            .border_1()
+            .rounded(px(6.0))
+            .overflow_hidden()
+            .child(preview_desc_row("Name", "GPUIShowCase"))
+            .child(preview_desc_row("Version", "0.1.0"))
+            .child(preview_desc_row("Framework", "gpui 0.2.2"))
+            .child(preview_desc_row("Components", "gpui-component 0.5.1"))
+            .child(preview_desc_row("License", "MIT"))
+            .into_any_element(),
+        ComponentId::GroupBox => div()
+            .v_flex()
+            .gap_3()
+            .child(
+                div()
+                    .p_3()
+                    .border_1()
+                    .rounded(px(8.0))
+                    .v_flex()
+                    .gap_2()
+                    .child(div().font_weight(FontWeight::SEMIBOLD).child("User Settings"))
+                    .child(Checkbox::new("gb-dark").label("Enable dark mode"))
+                    .child(Checkbox::new("gb-notif").label("Show notifications"))
+                    .child(Checkbox::new("gb-log").label("Verbose logging")),
+            )
+            .into_any_element(),
+        ComponentId::Scrollable => div()
+            .v_flex()
+            .gap_1()
+            .h(px(120.0))
+            .overflow_y_scrollbar()
+            .border_1()
+            .rounded(px(6.0))
+            .p_2()
+            .children((1..=20).map(|i| {
+                div()
+                    .px_2()
+                    .py_1()
+                    .border_b_1()
+                    .child(format!("Item {:02} — scroll to reveal more", i))
+            }))
+            .into_any_element(),
+        ComponentId::Clipboard => div()
+            .v_flex()
+            .gap_2()
+            .child(
+                div()
+                    .h_flex()
+                    .gap_2()
+                    .items_center()
+                    .px_3()
+                    .py_2()
+                    .border_1()
+                    .rounded(px(6.0))
+                    .child(div().flex_1().child("cargo add gpui-component"))
+                    .child(Button::new("preview-copy-btn").outline().label("Copy")),
+            )
+            .child(div().text_sm().child("✓ 클립보드에 복사되었습니다."))
+            .into_any_element(),
+        ComponentId::DropdownButton => div()
+            .v_flex()
+            .gap_2()
+            .child(
+                div()
+                    .h_flex()
+                    .border_1()
+                    .rounded(px(6.0))
+                    .overflow_hidden()
+                    .child(Button::new("preview-dd-main").outline().label("Actions"))
+                    .child(
+                        div()
+                            .border_l_1()
+                            .px_2()
+                            .py_2()
+                            .child("▾"),
+                    ),
+            )
+            .child(
+                div()
+                    .v_flex()
+                    .border_1()
+                    .rounded(px(6.0))
+                    .overflow_hidden()
+                    .child(preview_menu_item("Edit", "", false))
+                    .child(preview_menu_item("Duplicate", "", false))
+                    .child(preview_menu_item("Archive", "", false)),
+            )
+            .into_any_element(),
+        ComponentId::Image => div()
+            .v_flex()
+            .gap_2()
+            .child(
+                div()
+                    .w_full()
+                    .h(px(120.0))
+                    .border_1()
+                    .rounded(px(8.0))
+                    .flex()
+                    .items_center()
+                    .justify_center()
+                    .child("🖼 Image placeholder"),
+            )
+            .child(div().text_sm().child("img() 함수로 파일 경로 또는 URL을 지정합니다."))
+            .into_any_element(),
+        ComponentId::Kbd => div()
+            .h_flex()
+            .gap_2()
+            .items_center()
+            .child(div().text_sm().child("Save:"))
+            .child(preview_kbd("Ctrl"))
+            .child(div().child("+"))
+            .child(preview_kbd("S"))
+            .child(div().mx_2().child("|"))
+            .child(div().text_sm().child("Find:"))
+            .child(preview_kbd("Ctrl"))
+            .child(div().child("+"))
+            .child(preview_kbd("F"))
+            .into_any_element(),
+        ComponentId::Label => div()
+            .v_flex()
+            .gap_3()
+            .child(
+                div()
+                    .v_flex()
+                    .gap_1()
+                    .child(div().text_sm().font_weight(FontWeight::SEMIBOLD).child("Username"))
+                    .child(
+                        div()
+                            .px_3()
+                            .py_2()
+                            .border_1()
+                            .rounded(px(6.0))
+                            .child("alice_example"),
+                    ),
+            )
+            .child(
+                div()
+                    .v_flex()
+                    .gap_1()
+                    .child(div().text_sm().font_weight(FontWeight::SEMIBOLD).child("Email *"))
+                    .child(
+                        div()
+                            .px_3()
+                            .py_2()
+                            .border_1()
+                            .rounded(px(6.0))
+                            .child("alice@example.com"),
+                    ),
+            )
             .into_any_element(),
     }
 }
 
+fn accordion_item(title: &'static str, open: bool, content: &'static str) -> Div {
+    let mut item = div()
+        .v_flex()
+        .border_1()
+        .rounded(px(6.0))
+        .overflow_hidden()
+        .child(
+            div()
+                .h_flex()
+                .gap_2()
+                .px_3()
+                .py_2()
+                .border_b_1()
+                .child(div().flex_1().font_weight(FontWeight::SEMIBOLD).child(title))
+                .child(div().child(if open { "▲" } else { "▼" })),
+        );
+    if open {
+        item = item.child(div().px_3().py_2().child(content));
+    }
+    item
+}
+
+fn preview_page_btn(label: &'static str, active: bool) -> Div {
+    let d = div()
+        .w(px(32.0))
+        .h(px(32.0))
+        .flex()
+        .items_center()
+        .justify_center()
+        .border_1()
+        .rounded(px(4.0))
+        .text_sm()
+        .child(label);
+    if active { d.border_2() } else { d }
+}
+
+fn preview_step_dot(done: bool, label: &'static str) -> Div {
+    let d = div()
+        .w(px(28.0))
+        .h(px(28.0))
+        .rounded_full()
+        .flex()
+        .items_center()
+        .justify_center()
+        .border_2()
+        .text_sm()
+        .child(label);
+    if done { d } else { d.opacity(0.35) }
+}
+
+fn preview_star(filled: bool) -> Div {
+    let star = div().text_lg().child("★");
+    if filled { star } else { star.opacity(0.25) }
+}
+
+fn preview_slider(value: f32) -> Div {
+    div()
+        .h_flex()
+        .gap_2()
+        .items_center()
+        .child(div().w_full().child(Progress::new().value(value).w_full()))
+        .child(div().text_xs().w(px(32.0)).child(format!("{value:.0}")))
+}
+
+fn preview_select_option(label: &'static str, selected: bool) -> Div {
+    let d = div().px_3().py_2().border_b_1().child(label);
+    if selected { d.font_weight(FontWeight::SEMIBOLD) } else { d }
+}
+
+fn preview_otp_box(digit: &'static str) -> Div {
+    div()
+        .w(px(40.0))
+        .h(px(48.0))
+        .flex()
+        .items_center()
+        .justify_center()
+        .border_1()
+        .rounded(px(6.0))
+        .text_lg()
+        .font_weight(FontWeight::BOLD)
+        .child(digit)
+}
+
+fn preview_cal_day(day: &'static str, selected: bool) -> Div {
+    let d = div()
+        .flex_1()
+        .text_xs()
+        .text_center()
+        .px_1()
+        .py_px()
+        .rounded(px(4.0))
+        .child(day);
+    if selected { d.border_1() } else { d }
+}
+
+fn preview_cal_day_full(day: &'static str, selected: bool) -> Div {
+    let d = div()
+        .flex_1()
+        .text_xs()
+        .text_center()
+        .py_1()
+        .rounded(px(4.0))
+        .child(day);
+    if selected { d.border_1() } else { d }
+}
+
+fn preview_cal_header(day: &'static str) -> Div {
+    div()
+        .flex_1()
+        .text_xs()
+        .text_center()
+        .font_weight(FontWeight::SEMIBOLD)
+        .child(day)
+}
+
+fn preview_toast(kind: &'static str, message: &'static str, time: &'static str) -> Div {
+    let border_color: Rgba = match kind {
+        "success" => rgba(0x22c55eff),
+        "warning" => rgba(0xf59e0bff),
+        _ => rgba(0x3b82f6ff),
+    };
+    div()
+        .h_flex()
+        .gap_2()
+        .items_start()
+        .px_3()
+        .py_2()
+        .border_1()
+        .border_color(border_color)
+        .rounded(px(6.0))
+        .child(div().flex_1().child(message))
+        .child(div().text_xs().opacity(0.5).child(time))
+}
+
+fn preview_menu_item(label: &'static str, shortcut: &'static str, active: bool) -> Div {
+    let d = div()
+        .h_flex()
+        .gap_2()
+        .px_3()
+        .py_2()
+        .child(div().flex_1().child(label))
+        .child(div().text_xs().opacity(0.5).child(shortcut));
+    if active { d.border_l_2() } else { d }
+}
+
+fn preview_tab(label: &'static str, active: bool) -> Div {
+    let d = div()
+        .px_4()
+        .py_2()
+        .text_sm()
+        .child(label);
+    if active {
+        d.font_weight(FontWeight::SEMIBOLD).border_b_2()
+    } else {
+        d.opacity(0.55)
+    }
+}
+
+fn preview_tree_node(label: &'static str, indent: usize, _expanded: bool) -> Div {
+    div()
+        .h_flex()
+        .gap_1()
+        .px_2()
+        .py_px()
+        .border_b_1()
+        .pl(px(8.0 + indent as f32 * 16.0))
+        .child(label)
+}
+
+fn preview_desc_row(key: &'static str, value: &'static str) -> Div {
+    div()
+        .h_flex()
+        .gap_2()
+        .px_3()
+        .py_2()
+        .border_b_1()
+        .child(div().w(px(100.0)).font_weight(FontWeight::SEMIBOLD).child(key))
+        .child(div().flex_1().child(value))
+}
+
+fn preview_kbd(label: &'static str) -> Div {
+    div()
+        .px_2()
+        .py_px()
+        .border_1()
+        .rounded(px(4.0))
+        .text_sm()
+        .font_weight(FontWeight::SEMIBOLD)
+        .child(label)
+}
+
+fn color_swatch(color: Rgba) -> Div {
+    div()
+        .w(px(14.0))
+        .h(px(14.0))
+        .rounded_full()
+        .bg(color)
+}
+
 fn preview_nav_item(label: &'static str, selected: bool) -> Div {
     let base = div().px_2().py_1().rounded(px(4.0)).child(label);
-    if selected {
-        base.border_1()
-    } else {
-        base
-    }
+    if selected { base.border_1() } else { base }
 }
 
 fn preview_table_row(cells: &[&'static str], header: bool) -> Div {

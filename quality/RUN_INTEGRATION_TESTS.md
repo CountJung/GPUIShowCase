@@ -8,9 +8,9 @@
 
 1. Rust crate 존재 여부 확인
 2. 기본 검증 명령 실행
-3. 현재 Phase 관련 하네스 실행
+3. 현재 Phase 관련 프로젝트 맵 항목 실행
 4. 실패 시 원인 분류
-5. 결과를 하네스 맵에 반영
+5. 결과를 프로젝트 맵에 반영
 
 ## Baseline Commands
 
@@ -45,7 +45,7 @@
 
 - `web_mode` 서버가 기동된다.
 - `/health`가 응답한다.
-- 브라우저에서 hero, route cards, harness summary, platform notes가 보인다.
+- 브라우저에서 hero, route cards, project map summary, platform notes가 보인다.
 
 ## If Blocked
 

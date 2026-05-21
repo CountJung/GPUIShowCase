@@ -2,9 +2,10 @@ use gpui::*;
 use gpui_component::{
     StyledExt,
     resizable::{h_resizable, resizable_panel},
+    theme::{Theme, ThemeMode, ThemeRegistry},
 };
 
-use crate::app::layout::{content, header, sidebar};
+use crate::app::layout::{content, header, nav_panel, sidebar};
 use crate::shared::{
     logger::{self, AppLogLevel},
     state::{
@@ -167,122 +168,195 @@ impl AppRoot {
             cx.notify();
         }
     }
-}
 
+    fn apply_theme(
+        &mut self,
+        theme_name: &SharedString,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
+        if let Some(theme_config) = ThemeRegistry::global(cx).themes().get(theme_name).cloned() {
+            let mode = theme_config.mode;
+            {
+                let theme = Theme::global_mut(cx);
+                if mode == ThemeMode::Dark {
+                    theme.dark_theme = theme_config;
+                } else {
+                    theme.light_theme = theme_config;
+                }
+            }
+            Theme::change(mode, Some(window), cx);
+            self.state.settings.set_selected_theme(theme_name.clone());
+            logger::emit_event(
+                AppLogLevel::Info,
+                "app.theme",
+                format!("theme changed to {}", theme_name),
+            );
+            cx.notify();
+        }
+    }
+
+    fn get_available_themes(cx: &Context<Self>) -> Vec<(SharedString, bool)> {
+        ThemeRegistry::global(cx)
+            .sorted_themes()
+            .iter()
+            .map(|t| (t.name.clone(), t.mode == ThemeMode::Dark))
+            .collect()
+    }
+}
 impl Render for AppRoot {
     fn render(&mut self, _: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
-        let sidebar = sidebar::render_sidebar(
+        let available_themes = Self::get_available_themes(cx);
+
+        // ── Column 1: narrow icon strip (48 px) ──────────────────────────────
+        let icon_strip = sidebar::render_icon_strip(
             &self.state,
             cx.listener(|this, route: &AppRoute, w, cx| {
                 this.apply_route(*route, w, cx);
             }),
+        );
+
+        // ── Column 2: context nav panel (220 px default, resizable) ──────────
+        let nav = nav_panel::render_nav_panel(
+            &self.state,
             cx.listener(|this, cat: &ComponentCategory, w, cx| {
+                // Ensure we're on the Components route when a category is clicked
+                if this.state.current_route != AppRoute::Components {
+                    this.apply_route(AppRoute::Components, w, cx);
+                }
                 this.apply_category(*cat, w, cx);
             }),
             cx.listener(|this, id: &ComponentId, w, cx| {
+                if this.state.current_route != AppRoute::Components {
+                    this.apply_route(AppRoute::Components, w, cx);
+                }
                 this.apply_component(*id, w, cx);
-            }),
-            cx.listener(|this, _: &ClickEvent, _, cx| {
-                this.state.toggle_sidebar();
-                cx.notify();
             }),
         );
 
+        // ── Column 3: main content ────────────────────────────────────────────
         let main_content = div()
             .size_full()
             .v_flex()
-            .gap_3()
             .child(header::render_header(&self.state))
-            .child(content::render_content(
-                &self.state,
-                content::PlaygroundContentActions {
-                    on_preview_kind_select: cx.listener(
-                        |this, selected_indices: &Vec<usize>, window, cx| {
-                            this.apply_playground_preview_kind_selection(
-                                selected_indices.as_slice(),
-                                window,
-                                cx,
-                            );
+            .child(
+                div()
+                    .flex_1()
+                    .child(content::render_content(
+                        &self.state,
+                        content::PlaygroundContentActions {
+                            on_preview_kind_select: cx.listener(
+                                |this, selected_indices: &Vec<usize>, window, cx| {
+                                    this.apply_playground_preview_kind_selection(
+                                        selected_indices.as_slice(),
+                                        window,
+                                        cx,
+                                    );
+                                },
+                            ),
+                            on_toggle_selected: cx.listener(
+                                |this, _: &ClickEvent, window, cx| {
+                                    this.apply_playground_action(
+                                        PlaygroundAction::ToggleSelected,
+                                        window,
+                                        cx,
+                                    );
+                                },
+                            ),
+                            on_toggle_loading: cx.listener(
+                                |this, _: &ClickEvent, window, cx| {
+                                    this.apply_playground_action(
+                                        PlaygroundAction::ToggleLoading,
+                                        window,
+                                        cx,
+                                    );
+                                },
+                            ),
+                            on_toggle_compact: cx.listener(
+                                |this, _: &ClickEvent, window, cx| {
+                                    this.apply_playground_action(
+                                        PlaygroundAction::ToggleCompact,
+                                        window,
+                                        cx,
+                                    );
+                                },
+                            ),
+                            on_increase_intensity: cx.listener(
+                                |this, _: &ClickEvent, window, cx| {
+                                    this.apply_playground_action(
+                                        PlaygroundAction::IncreaseIntensity,
+                                        window,
+                                        cx,
+                                    );
+                                },
+                            ),
+                            on_decrease_intensity: cx.listener(
+                                |this, _: &ClickEvent, window, cx| {
+                                    this.apply_playground_action(
+                                        PlaygroundAction::DecreaseIntensity,
+                                        window,
+                                        cx,
+                                    );
+                                },
+                            ),
                         },
-                    ),
-                    on_toggle_selected: cx.listener(|this, _: &ClickEvent, window, cx| {
-                        this.apply_playground_action(
-                            PlaygroundAction::ToggleSelected,
-                            window,
-                            cx,
-                        );
-                    }),
-                    on_toggle_loading: cx.listener(|this, _: &ClickEvent, window, cx| {
-                        this.apply_playground_action(
-                            PlaygroundAction::ToggleLoading,
-                            window,
-                            cx,
-                        );
-                    }),
-                    on_toggle_compact: cx.listener(|this, _: &ClickEvent, window, cx| {
-                        this.apply_playground_action(
-                            PlaygroundAction::ToggleCompact,
-                            window,
-                            cx,
-                        );
-                    }),
-                    on_increase_intensity: cx.listener(|this, _: &ClickEvent, window, cx| {
-                        this.apply_playground_action(
-                            PlaygroundAction::IncreaseIntensity,
-                            window,
-                            cx,
-                        );
-                    }),
-                    on_decrease_intensity: cx.listener(|this, _: &ClickEvent, window, cx| {
-                        this.apply_playground_action(
-                            PlaygroundAction::DecreaseIntensity,
-                            window,
-                            cx,
-                        );
-                    }),
-                },
-                content::SettingsContentActions {
-                    on_log_level_select: cx.listener(
-                        |this, selected_indices: &Vec<usize>, window, cx| {
-                            this.apply_log_level_selection(
-                                selected_indices.as_slice(),
-                                window,
-                                cx,
-                            );
+                        content::SettingsContentActions {
+                            on_log_level_select: cx.listener(
+                                |this, selected_indices: &Vec<usize>, window, cx| {
+                                    this.apply_log_level_selection(
+                                        selected_indices.as_slice(),
+                                        window,
+                                        cx,
+                                    );
+                                },
+                            ),
+                            on_layout_density_select: cx.listener(
+                                |this, selected_indices: &Vec<usize>, window, cx| {
+                                    this.apply_layout_density_selection(
+                                        selected_indices.as_slice(),
+                                        window,
+                                        cx,
+                                    );
+                                },
+                            ),
+                            on_performance_mode_select: cx.listener(
+                                |this, selected_indices: &Vec<usize>, window, cx| {
+                                    this.apply_performance_mode_selection(
+                                        selected_indices.as_slice(),
+                                        window,
+                                        cx,
+                                    );
+                                },
+                            ),
+                            on_theme_select: cx.listener(
+                                |this, theme_name: &SharedString, window, cx| {
+                                    this.apply_theme(theme_name, window, cx);
+                                },
+                            ),
                         },
-                    ),
-                    on_layout_density_select: cx.listener(
-                        |this, selected_indices: &Vec<usize>, window, cx| {
-                            this.apply_layout_density_selection(
-                                selected_indices.as_slice(),
-                                window,
-                                cx,
-                            );
-                        },
-                    ),
-                    on_performance_mode_select: cx.listener(
-                        |this, selected_indices: &Vec<usize>, window, cx| {
-                            this.apply_performance_mode_selection(
-                                selected_indices.as_slice(),
-                                window,
-                                cx,
-                            );
-                        },
-                    ),
-                },
-            ));
+                        available_themes,
+                    )),
+            );
 
+        // ── Root: icon_strip | resizable(nav | content) ───────────────────────
         div()
             .size_full()
+            .h_flex()
+            .child(icon_strip)
             .child(
-                h_resizable("showcase-main")
+                div()
+                    .flex_1()
+                    .h_full()
                     .child(
-                        resizable_panel()
-                            .size(px(260.0))
-                            .size_range(px(160.0)..px(400.0))
-                            .child(sidebar),
-                    )
-                    .child(resizable_panel().child(main_content)),
+                        h_resizable("nav-content-split")
+                            .child(
+                                resizable_panel()
+                                    .size(px(220.0))
+                                    .size_range(px(140.0)..px(380.0))
+                                    .child(nav),
+                            )
+                            .child(resizable_panel().child(main_content)),
+                    ),
             )
     }
 }

@@ -1,5 +1,5 @@
 use gpui::*;
-use gpui_component::Root;
+use gpui_component::{Root, theme::{Theme, ThemeRegistry}};
 
 mod app;
 mod features;
@@ -26,8 +26,32 @@ fn main() {
 
     app.run(move |cx| {
         gpui_component::init(cx);
-        // Force light theme (system dark mode is not overridden by bundled theme files)
-        gpui_component::Theme::change(gpui::WindowAppearance::Light, None, cx);
+
+        // Load JSON preset themes and apply GitHub Light/Dark as defaults.
+        let themes_dir = std::path::PathBuf::from("themes");
+        if let Err(e) = ThemeRegistry::watch_dir(themes_dir, cx, |cx| {
+            // Apply GitHub Light as the default light theme.
+            if let Some(light) = ThemeRegistry::global(cx)
+                .themes()
+                .get(&gpui::SharedString::from("GitHub Light"))
+                .cloned()
+            {
+                Theme::global_mut(cx).light_theme = light;
+            }
+            // Apply GitHub Dark as the default dark theme.
+            if let Some(dark) = ThemeRegistry::global(cx)
+                .themes()
+                .get(&gpui::SharedString::from("GitHub Dark"))
+                .cloned()
+            {
+                Theme::global_mut(cx).dark_theme = dark;
+            }
+            // Stay in light mode by default.
+            gpui_component::Theme::change(gpui::WindowAppearance::Light, None, cx);
+            tracing::info!("Theme presets loaded; GitHub Light/Dark applied as defaults");
+        }) {
+            tracing::error!("Failed to watch themes directory: {}", e);
+        }
 
         let initial_state = initial_state_from_launch(&launch_overrides, &logger_runtime);
 

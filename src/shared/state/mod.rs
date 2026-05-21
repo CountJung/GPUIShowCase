@@ -1,4 +1,5 @@
 use crate::shared::logger::{AppLogLevel, LoggerRuntime};
+use gpui::SharedString;
 
 const PLAYGROUND_LOG_LIMIT: usize = 8;
 const UI_LOG_LIMIT: usize = 24;
@@ -588,6 +589,7 @@ pub struct SettingsState {
     pub performance_mode: PerformanceMode,
     pub log_directory: String,
     pub rolling_strategy: String,
+    pub selected_theme_name: SharedString,
 }
 
 impl Default for SettingsState {
@@ -598,7 +600,14 @@ impl Default for SettingsState {
             performance_mode: PerformanceMode::Balanced,
             log_directory: "logs".to_string(),
             rolling_strategy: "daily app.log rotation".to_string(),
+            selected_theme_name: SharedString::from("GitHub Light"),
         }
+    }
+}
+
+impl SettingsState {
+    pub fn set_selected_theme(&mut self, name: SharedString) {
+        self.selected_theme_name = name;
     }
 }
 

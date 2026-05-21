@@ -23,10 +23,12 @@ pub struct SettingsContentActions<
     OnLogLevelSelect,
     OnLayoutDensitySelect,
     OnPerformanceModeSelect,
+    OnThemeSelect,
 > {
     pub on_log_level_select: OnLogLevelSelect,
     pub on_layout_density_select: OnLayoutDensitySelect,
     pub on_performance_mode_select: OnPerformanceModeSelect,
+    pub on_theme_select: OnThemeSelect,
 }
 
 pub fn render_content(
@@ -43,7 +45,9 @@ pub fn render_content(
         impl Fn(&Vec<usize>, &mut Window, &mut App) + 'static,
         impl Fn(&Vec<usize>, &mut Window, &mut App) + 'static,
         impl Fn(&Vec<usize>, &mut Window, &mut App) + 'static,
+        impl Fn(&gpui::SharedString, &mut Window, &mut App) + 'static,
     >,
+    available_themes: Vec<(gpui::SharedString, bool)>,
 ) -> impl IntoElement {
     match state.current_route {
         crate::shared::state::AppRoute::Dashboard => {
@@ -70,6 +74,8 @@ pub fn render_content(
             settings_actions.on_log_level_select,
             settings_actions.on_layout_density_select,
             settings_actions.on_performance_mode_select,
+            settings_actions.on_theme_select,
+            available_themes,
         )
         .into_any_element(),
         crate::shared::state::AppRoute::Logs => {
