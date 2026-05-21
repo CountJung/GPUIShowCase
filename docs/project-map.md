@@ -23,11 +23,11 @@
 | 항목 ID | 대상 기능 | 계층 | 검증 방식 | 실행 트리거 또는 명령 | 기대 결과 | 증거 위치 | 상태 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | PM-001 | 앱 부트스트랩 | bootstrap | smoke | `cargo run` | 기본 창이 열리고 즉시 종료되지 않음 | `cargo run` 완료 후 `target-agent\debug\gpuishowcase.exe` 실행 확인. 화면 캡처 시각 `2026-04-17T06:03:37Z` | PASS |
-| PM-002 | 루트 레이아웃 | layout | manual | 앱 실행 후 셸 확인 | Sidebar, Header, Content 구조가 유지됨 | 화면 캡처 시각 `2026-04-17T06:03:37Z`, 창 리사이즈 후 재확인 `2026-04-17T06:04:01Z` | PASS |
-| PM-003 | 라우터 전환 | state | manual | 내비게이션 선택 | 선택 상태와 콘텐츠가 일치함 | `Components` 선택 후 화면 캡처 시각 `2026-04-17T06:19:44Z`. Header, 상태 문자열, 선택 컴포넌트 영역 동시 변경 확인 | PASS |
-| PM-004 | 테마 전환 | theme | manual | Settings → Theme 탭에서 테마 카드 선택 | 선택한 테마가 앱 전체에 즉시 적용됨 | 2026-05-21 구현. 10+ JSON 프리셋 테마 선택 기능 신규 추가 | PASS |
+| PM-002 | 루트 레이아웃 | layout | manual | 앱 실행 후 셸 확인 | 왼쪽 레일, examples 사이드바, Header, Content, Inspector 구조가 유지됨 | 2026-05-21 전면 재작성. `cargo fmt --check`, `cargo clippy --all-targets --all-features -- -D warnings`, `cargo test` 통과 | PASS |
+| PM-003 | 라우터 전환 | state | manual | 왼쪽 레일 및 examples 선택 | Showcase/Settings/Logs 전환과 선택 컴포넌트 상태가 일치함 | 2026-05-21 `AppRoute::Components`를 `Showcase` 기본 화면으로 변경. 상태 테스트 갱신 및 `cargo test` 통과 | PASS |
+| PM-004 | 테마 전환 | theme | manual | Settings → Theme Presets에서 테마 카드 선택 | GitHub Dark가 기본값이고, 선택한 JSON 테마가 앱 전체에 즉시 적용됨 | 2026-05-21 Settings 재설계. GitHub Light/Dark 및 10+ JSON 프리셋 선택 가능 | PASS |
 | PM-005 | Dashboard 렌더링 | feature | smoke | Dashboard 진입 | 요약 카드와 보조 시각화가 안전하게 렌더링됨 | `cargo run` 후 Dashboard 화면 캡처 시각 `2026-04-17T06:39:33Z`. System, Component, Render Performance, Theme, Chart Placeholder 카드 확인 | PASS |
-| PM-006 | Component Explorer | feature | manual | 컴포넌트 선택 및 전환 | Preview, Code Preview, Props Panel이 동기화됨 | `Components / Advanced / Editor` 화면 캡처 시각 `2026-04-17T06:55:47Z`. Header 상태 문자열과 Explorer 3개 패널 동기화 확인 | PASS |
+| PM-006 | Showcase Workbench | feature | manual | examples 사이드바에서 컴포넌트 선택 및 전환 | 중앙 Live Preview, 하단 Props Table, 우측 Inspector가 동기화됨 | 2026-05-21 `src/features/components/mod.rs`, `src/app/layout/nav_panel.rs`, `src/app/layout/sidebar.rs` 재작성. `cargo test` 통과 | PASS |
 | PM-007 | Playground 이벤트 로그 | feature | integration | Playground 상호작용 | 이벤트 로그와 상태 전이가 누락 없이 기록됨 | `target-agent\debug\gpuishowcase.exe --route playground --playground-script preview-badge,toggle-selected,increase-intensity,toggle-loading` 실행 후 화면 캡처 시각 `2026-04-17T07:35:44Z`. Real-time Composition, User Event Log, State Change Trace 동시 노출 확인 | PASS |
 | PM-008 | Data Showcase | data | integration | 공통 샘플 데이터 로딩 | 표, 차트, 리스트가 동일 데이터 기준으로 갱신됨 | `target-agent\debug\gpuishowcase.exe --route data-showcase` 실행 후 화면 캡처 시각 `2026-04-17T07:50:35Z`. Shared Dataset Overview, DataTable Sample, Trend Chart, File Explorer List 동시 노출 확인 | PASS |
 | PM-009 | 파일 로깅 및 UI 로그 뷰 | logging | integration | `target-agent\debug\gpuishowcase.exe --route logs` 실행 후 Logs 화면과 `logs/` 디렉터리 확인 | `logs/` 아래에 파일 로그가 생성되고, UI 로그 페이지 또는 패널에서 동일 계열 로그를 확인할 수 있음 | `target-agent\debug\gpuishowcase.exe --route logs` 실행 후 화면 캡처 시각 `2026-04-17T08:10:57Z`. `logs\app.log.2026-04-17` 생성 및 초기화 로그 기록 확인 | PASS |
@@ -47,4 +47,5 @@
 - PM-009는 2026-04-17 Logs runtime 화면 캡처와 `logs\app.log.2026-04-17` 파일 생성 확인 기준으로 갱신했다.
 - PM-011은 2026-04-17 independent web mode 서버 기동, `/health` 응답, 브라우저 snapshot 기준으로 갱신했다.
 - PM-012는 2026-05-21 신규 추가. JSON 프리셋 테마 기능 구현 완료.
+- 2026-05-21: upstream `longbridge/gpui-component` 문서 확인 후 Showcase 첫 화면과 examples 사이드바 구조로 전면 재작성했다. 참고한 upstream 기준: README의 `story` gallery, `examples` standalone folder, `crates/story/src/stories` 목록.
 - 이후 레이아웃 구조나 상태 모델이 바뀌면 PM-002, PM-003, PM-004, PM-006을 다시 확인한다.

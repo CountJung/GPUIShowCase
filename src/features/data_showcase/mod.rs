@@ -258,7 +258,7 @@ fn render_strategy_panel(model: &DataShowcaseModel) -> Div {
             "대용량 기준선은 {}개 synthetic rows를 목표로 두고 VirtualList 또는 집계 렌더링으로 확장합니다.",
             model.large_dataset_hint
         ))
-        .child("HM-010은 Data Showcase route가 같은 데이터 구조로 표/차트/리스트를 동시에 렌더링하면서도 초기 표시가 멈추지 않는지 확인하는 smoke 기준으로 관리합니다.")
+        .child("PM-010은 Data Showcase route가 같은 데이터 구조로 표/차트/리스트를 동시에 렌더링하면서도 초기 표시가 멈추지 않는지 확인하는 smoke 기준으로 관리합니다.")
 }
 
 fn table_header_row() -> Div {

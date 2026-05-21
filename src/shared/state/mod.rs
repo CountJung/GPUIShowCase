@@ -6,8 +6,8 @@ const UI_LOG_LIMIT: usize = 24;
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum AppRoute {
-    #[default]
     Dashboard,
+    #[default]
     Components,
     Playground,
     Data,
@@ -28,7 +28,7 @@ impl AppRoute {
     pub fn title(self) -> &'static str {
         match self {
             Self::Dashboard => "Dashboard",
-            Self::Components => "Components",
+            Self::Components => "Showcase",
             Self::Playground => "Playground",
             Self::Data => "Data Showcase",
             Self::Settings => "Settings",
@@ -39,10 +39,10 @@ impl AppRoute {
     pub fn description(self) -> &'static str {
         match self {
             Self::Dashboard => "프로젝트 상태와 기본 요약",
-            Self::Components => "컴포넌트 탐색과 선택 흐름",
+            Self::Components => "gpui-component examples를 선택하고 즉시 확인하는 워크벤치",
             Self::Playground => "상태 변화와 이벤트 실험 공간",
             Self::Data => "공통 데이터셋 기반의 표, 차트, 리스트 실험 화면",
-            Self::Settings => "사용자 설정과 적용 상태",
+            Self::Settings => "GitHub 기본 테마와 프리셋 테마 모드 선택",
             Self::Logs => "롤링 파일 로그와 UI 로그 뷰",
         }
     }
@@ -600,7 +600,7 @@ impl Default for SettingsState {
             performance_mode: PerformanceMode::Balanced,
             log_directory: "logs".to_string(),
             rolling_strategy: "daily app.log rotation".to_string(),
-            selected_theme_name: SharedString::from("GitHub Light"),
+            selected_theme_name: SharedString::from("GitHub Dark"),
         }
     }
 }
@@ -643,9 +643,9 @@ pub struct AppState {
 impl AppState {
     pub fn new() -> Self {
         let mut state = Self {
-            current_route: AppRoute::Dashboard,
-            selected_component_category: None,
-            selected_component: None,
+            current_route: AppRoute::Components,
+            selected_component_category: Some(ComponentCategory::Basic),
+            selected_component: Some(ComponentId::Button),
             playground: PlaygroundState::new(),
             settings: SettingsState::default(),
             ui_logs: Vec::new(),
@@ -671,10 +671,6 @@ impl AppState {
             ),
         );
         self.status_message = self.compose_status_message();
-    }
-
-    pub fn toggle_sidebar(&mut self) {
-        self.sidebar_collapsed = !self.sidebar_collapsed;
     }
 
     pub fn navigate_to(&mut self, route: AppRoute) {
@@ -752,6 +748,16 @@ impl AppState {
             AppLogLevel::Info,
             "app.settings",
             format!("Performance mode changed to {}", mode.title()),
+        );
+        self.status_message = self.compose_status_message();
+    }
+
+    pub fn set_selected_theme(&mut self, name: SharedString) {
+        self.settings.set_selected_theme(name.clone());
+        self.record_ui_log(
+            AppLogLevel::Info,
+            "app.theme",
+            format!("Theme changed to {}", name),
         );
         self.status_message = self.compose_status_message();
     }
@@ -839,7 +845,7 @@ mod tests {
             Some(ComponentCategory::Basic)
         );
         assert_eq!(state.selected_component, Some(ComponentId::Button));
-        assert!(state.status_message.contains("Components"));
+        assert!(state.status_message.contains("Showcase"));
     }
 
     #[test]

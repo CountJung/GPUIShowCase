@@ -17,6 +17,7 @@ Phase 0부터 Phase 9까지의 결과와 검증 흔적만 남기고, 장황한 �
 | 7 | DONE | Data Showcase shared dataset flow | PM-008, PM-010 PASS |
 | 8 | DONE | Settings, rolling file logs, UI logs | PM-009 PASS |
 | 9 | DONE with noted gaps | 테스트 전략, 코드 투어, backlog, VS Code debug, independent web mode | PM-011 PASS, Linux/macOS smoke는 backlog 유지 |
+| 13 | DONE | Showcase-first shell, examples sidebar, GitHub Dark default theme, Settings theme presets | `cargo fmt --check`, `cargo clippy --all-targets --all-features -- -D warnings`, `cargo test` PASS |
 
 ## Consolidation Note
 
@@ -29,6 +30,7 @@ Phase 0부터 Phase 9까지의 결과와 검증 흔적만 남기고, 장황한 �
 - 로그 시스템을 file + UI dual-surface로 정리했다.
 - Data Showcase 범위를 stock/trading이 아닌 generic operational data로 고정했다.
 - VS Code 디버그 경로를 desktop native와 independent web mode로 분리했다.
+- 2026-05-21: upstream `longbridge/gpui-component` README, `examples`, `crates/story/src/stories` 구성을 확인하고 첫 화면을 Dashboard에서 Showcase examples 워크벤치로 변경했다.
 
 ## Verification Record
 

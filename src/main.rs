@@ -1,5 +1,8 @@
 use gpui::*;
-use gpui_component::{Root, theme::{Theme, ThemeRegistry}};
+use gpui_component::{
+    Root,
+    theme::{Theme, ThemeRegistry},
+};
 
 mod app;
 mod features;
@@ -19,6 +22,18 @@ struct LaunchOverrides {
 }
 
 fn main() {
+    // Debug builds generate deep call stacks through GPUI's generic element types.
+    // Running on a 64 MB stack prevents stack-overflow crashes during debugging.
+    std::thread::Builder::new()
+        .name("gpuishowcase-main".to_string())
+        .stack_size(64 * 1024 * 1024)
+        .spawn(run)
+        .expect("failed to spawn main thread")
+        .join()
+        .expect("main thread panicked");
+}
+
+fn run() {
     let logger_runtime =
         logger::init_logging(AppLogLevel::Info).expect("failed to initialize logging");
     let launch_overrides = launch_overrides_from_process();
@@ -27,10 +42,9 @@ fn main() {
     app.run(move |cx| {
         gpui_component::init(cx);
 
-        // Load JSON preset themes and apply GitHub Light/Dark as defaults.
+        // Load JSON preset themes and apply the GitHub pair as the default theme set.
         let themes_dir = std::path::PathBuf::from("themes");
         if let Err(e) = ThemeRegistry::watch_dir(themes_dir, cx, |cx| {
-            // Apply GitHub Light as the default light theme.
             if let Some(light) = ThemeRegistry::global(cx)
                 .themes()
                 .get(&gpui::SharedString::from("GitHub Light"))
@@ -46,9 +60,8 @@ fn main() {
             {
                 Theme::global_mut(cx).dark_theme = dark;
             }
-            // Stay in light mode by default.
-            gpui_component::Theme::change(gpui::WindowAppearance::Light, None, cx);
-            tracing::info!("Theme presets loaded; GitHub Light/Dark applied as defaults");
+            gpui_component::Theme::change(gpui::WindowAppearance::Dark, None, cx);
+            tracing::info!("Theme presets loaded; GitHub Dark applied as the startup theme");
         }) {
             tracing::error!("Failed to watch themes directory: {}", e);
         }

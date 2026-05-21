@@ -9,7 +9,7 @@
 
 1. `main`이 logging runtime을 초기화한다.
 2. launch override를 읽어 초기 `AppState`를 구성한다.
-3. `app::root::AppRoot`가 Sidebar, Header, Content를 조합한다.
+3. `app::root::AppRoot`가 왼쪽 레일, examples 사이드바, Header, Content를 조합한다.
 4. route/theme/component/settings 액션이 `AppState`를 갱신한다.
 5. UI 로그와 파일 로그가 동일 이벤트 계열을 기록한다.
 
@@ -33,11 +33,12 @@
 
 ## 5. Feature Surfaces
 
-- `src/features/dashboard/mod.rs`: 요약 카드와 baseline 메트릭
-- `src/features/components/mod.rs`: registry-driven component explorer
+- `src/app/layout/sidebar.rs`: Showcase/Settings/Logs 전환용 icon rail
+- `src/app/layout/nav_panel.rs`: gpui-component examples 선택 사이드바
+- `src/features/components/mod.rs`: registry-driven Showcase workbench
 - `src/features/playground/mod.rs`: action log + state trace
 - `src/features/data_showcase/mod.rs`: shared dataset 기반 시각화
-- `src/features/settings/mod.rs`: settings page + logs page
+- `src/features/settings/mod.rs`: GitHub 기본 테마 및 JSON 프리셋 선택 + logs page
 
 ## 6. Debug Paths
 

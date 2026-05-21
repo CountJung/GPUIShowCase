@@ -9,6 +9,7 @@
 - [x] canonical master plan을 `docs/master-plan.md`로 이관
 - [x] phase별 상세 문서를 이력 문서로 통합
 - [x] native desktop + independent web mode 디버그 경로 정리
+- [x] 2026-05-21 Showcase-first shell 재작성 및 GitHub Dark 기본 테마 적용
 
 ## Canonical Documents
 
@@ -37,11 +38,11 @@
 | Quality and testing docs | DONE | `docs/testing-strategy.md`, `quality/` |
 | VS Code debugging setup | DONE | `docs/debugging.md`, `.vscode/` |
 | Independent web mode | DONE | `docs/debugging.md`, `web/`, `src/bin/web_mode.rs` |
-| Light theme default | DONE | `src/main.rs` — `Theme::change(Light)` |
+| GitHub Dark default | DONE | `src/main.rs` — `Theme::change(Dark)` + `themes/github.json` |
 | 53 ComponentId variants | DONE | `src/shared/state/mod.rs` |
-| Hierarchical sidebar nav | DONE | `src/app/layout/sidebar.rs` — `Sidebar<SidebarMenu>` |
-| Resizable layout | DONE | `src/app/root.rs` — `h_resizable` + `resizable_panel` |
-| Component showcase panel | DONE | `src/features/components/mod.rs` — `render_component_showcase` |
+| Examples sidebar nav | DONE | `src/app/layout/nav_panel.rs` — category/component example index |
+| Showcase workbench layout | DONE | `src/app/root.rs`, `src/features/components/mod.rs` |
+| Component showcase panel | DONE | `src/features/components/mod.rs` — live preview/table/inspector |
 
 ## Open Backlog
 

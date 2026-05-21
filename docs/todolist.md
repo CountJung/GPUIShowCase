@@ -9,7 +9,7 @@
 | `docs/todolist.md` | 실행 체크리스트 (이 파일) |
 | `docs/master-plan.md` | 아키텍처 및 전략 계획 |
 | `docs/implementation-history.md` | 구현 이력 |
-| `docs/harness-map.md` | 하네스 검증 맵 |
+| `docs/project-map.md` | 프로젝트 검증 맵 |
 | `docs/testing-strategy.md` | 테스트 전략 |
 | `docs/code-tour.md` | 코드 구조 투어 |
 | `docs/backlog.md` | 미결 항목 |
@@ -28,7 +28,7 @@
 | 영역 | 상태 | 기준 문서 |
 | --- | --- | --- |
 | Native app shell and routes | DONE | `docs/master-plan.md` |
-| Logging and settings | DONE | `docs/harness-map.md` |
+| Logging and settings | DONE | `docs/project-map.md` |
 | Quality and testing docs | DONE | `docs/testing-strategy.md`, `quality/` |
 | VS Code debugging setup | DONE | `docs/debugging.md`, `.vscode/` |
 | Independent web mode | DONE | `docs/debugging.md`, `web/`, `src/bin/web_mode.rs` |
@@ -54,7 +54,7 @@
 - [x] PH10-004: `settings/mod.rs`에서 Theme 패널 제거
 - [x] PH10-005: `dashboard/mod.rs`에서 ThemeOverview 제거
 - [x] PH10-006: `root.rs` 및 `content.rs`에서 theme 콜백 제거
-- [x] PH10-007: `docs/harness-map.md` HM-004 상태 SUPERSEDED 업데이트
+- [x] PH10-007: `docs/project-map.md` PM-004 상태 업데이트
 - [x] PH10-008: `cargo check` + `cargo clippy` 검증
 
 ---
@@ -170,7 +170,7 @@
 1. 현재 STUB 컴포넌트들의 실제 gpui-component 연동부터 시작한다.
 2. 신규 컴포넌트는 카테고리별로 묶어서 처리한다.
 3. 각 컴포넌트는 `ComponentId` 열거형 추가 → 상태 등록 → Preview 구현 순으로 진행한다.
-4. 각 배치 완료마다 `docs/harness-map.md`에 HM-012 이상 항목을 추가한다.
+4. 각 배치 완료마다 `docs/project-map.md`에 PM-012 이상 항목을 추가한다.
 
 ---
 
@@ -190,5 +190,5 @@
 새 기능을 추가할 때:
 1. 이 파일에 Phase 항목을 추가한다.
 2. `docs/master-plan.md`의 문서 맵을 확인한다.
-3. `docs/harness-map.md`에 검증 항목을 추가한다.
+3. `docs/project-map.md`에 검증 항목을 추가한다.
 4. 코드와 문서를 같은 단위에서 갱신한다.

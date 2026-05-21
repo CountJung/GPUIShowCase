@@ -16,14 +16,14 @@
 
 | 영역 | 자동 검증 | 수동 또는 스모크 검증 |
 | --- | --- | --- |
-| Bootstrap | `cargo check`, `cargo test` | HM-001 |
-| Shell/Layout | 상태 모델 테스트 간접 확인 | HM-002 |
-| Routing/Theme | `shared/state` 테스트 | HM-003, HM-004 |
-| Dashboard | 모델 테스트 | HM-005 |
-| Components | registry 테스트 | HM-006 |
-| Playground | 상태 전이 테스트 | HM-007 |
-| Data Showcase | dataset 테스트 | HM-008, HM-010 |
-| Settings/Logging | 상태/로그 테스트 | HM-009 |
+| Bootstrap | `cargo check`, `cargo test` | PM-001 |
+| Shell/Layout | 상태 모델 테스트 간접 확인 | PM-002 |
+| Routing/Theme | `shared/state` 테스트 | PM-003, PM-004 |
+| Dashboard | 모델 테스트 | PM-005 |
+| Showcase Workbench | registry 테스트 + examples 선택 수동 확인 | PM-006 |
+| Playground | 상태 전이 테스트 | PM-007 |
+| Data Showcase | dataset 테스트 | PM-008, PM-010 |
+| Settings/Logging | 상태/로그 테스트 | PM-009 |
 
 ## Independent Web Mode Checks
 
@@ -38,6 +38,13 @@
 - Windows: 현재 저장소에서 실제 빌드/실행 검증 완료
 - Linux: VS Code task와 script는 제공하지만, 이 Windows workspace에서는 런타임 검증을 수행하지 못했다
 - macOS: VS Code task와 script는 제공하지만, 이 Windows workspace에서는 런타임 검증을 수행하지 못했다
+
+## 2026-05-21 Rewrite Checks
+
+- `cargo fmt --check`: PASS
+- `cargo clippy --all-targets --all-features -- -D warnings`: PASS
+- `cargo test`: PASS
+- 수동 확인 대상: 앱 실행 후 기본 화면이 Showcase이고 GitHub Dark 테마로 시작하는지, Settings에서 GitHub Light/Dark 및 다른 프리셋 전환이 즉시 반영되는지 확인한다.
 
 ## Re-entry Conditions
 

@@ -3,7 +3,7 @@
 ## 목적
 
 - `gpui`와 `gpui-component` 기반의 데스크톱 쇼케이스 앱을 유지 가능한 구조로 운영한다.
-- 단순 갤러리가 아니라 상태, 로그, 데이터 시각화, 검증 경로를 포함한 실제 앱 수준 UX를 제공한다.
+- upstream `longbridge/gpui-component`의 `story` 갤러리와 standalone `examples` 흐름을 참고해, 이 프로젝트의 첫 화면을 예제 선택형 워크벤치로 제공한다.
 - 네이티브 데스크톱 앱을 주 축으로 두고, 독립 웹 모드는 문서·데모·디버깅 보조 채널로 분리해 운영한다.
 
 ## 런타임 전략
@@ -25,8 +25,8 @@
 ### Native App
 
 - `src/main.rs`: 앱 부트스트랩, 시작 인자 해석, 로그 런타임 초기화
-- `src/app/`: 루트 뷰와 레이아웃 조합
-- `src/features/`: Dashboard, Components, Playground, Data Showcase, Settings
+- `src/app/`: 왼쪽 레일, examples 사이드바, 헤더, 콘텐츠 조합
+- `src/features/`: Showcase 워크벤치, Settings, Logs 및 유지보수용 부가 feature
 - `src/shared/state/`: 공용 앱 상태, 라우트, 로그/설정 상태
 - `src/shared/logger/`: rolling file logging, log-level 반영
 
@@ -41,11 +41,8 @@
 
 ### Native Routes
 
-- Dashboard: 시스템/구성 요약
-- Components: 카테고리별 컴포넌트 탐색
-- Playground: 상태 변화와 이벤트 실험
-- Data Showcase: 공통 운영 데이터셋 기반 시각화
-- Settings: theme, log level, density, performance mode
+- Showcase: 사이드바에서 examples를 선택하고 중앙 preview, 하단 props table, 우측 inspector를 확인
+- Settings: GitHub Dark 기본 테마 및 JSON 프리셋 theme mode 선택, log level, density, performance mode
 - Logs: in-app UI 로그와 파일 로그 정보
 
 ### Web Surface
@@ -69,7 +66,7 @@
 - `cargo check`
 - `cargo clippy --all-targets --all-features -- -D warnings`
 - `cargo test`
-- `docs/harness-map.md`의 현재 PASS 항목 유지
+- `docs/project-map.md`의 현재 PASS 항목 유지
 - web mode 추가 이후에는 독립 서버와 브라우저 로드 확인 포함
 
 ## 문서 맵
@@ -77,7 +74,7 @@
 - 실행 체크리스트: `docs/todolist.md`
 - 현재 구조/목표: `docs/master-plan.md`
 - 구현 이력: `docs/implementation-history.md`
-- 검증 범위: `docs/harness-map.md`
+- 검증 범위: `docs/project-map.md`
 - 테스트 전략: `docs/testing-strategy.md`
 - 구조 투어: `docs/code-tour.md`
 - 남은 리스크와 재진입 조건: `docs/backlog.md`
