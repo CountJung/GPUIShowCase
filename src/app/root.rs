@@ -229,7 +229,7 @@ impl Render for AppRoot {
             .size_full()
             .v_flex()
             .child(header::render_header(&self.state))
-            .child(div().flex_1().overflow_y_scrollbar().child(content::render_content(
+            .child(div().flex_1().min_h(px(0.0)).overflow_y_scrollbar().child(content::render_content(
                 &self.state,
                 content::PlaygroundContentActions {
                     on_preview_kind_select: cx.listener(

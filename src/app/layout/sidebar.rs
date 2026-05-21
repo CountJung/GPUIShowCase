@@ -1,17 +1,17 @@
 use gpui::*;
-use gpui_component::{Icon, IconName, StyledExt};
+use gpui_component::StyledExt;
 
 use crate::shared::state::{AppRoute, AppState};
 
 type RouteHandler = std::rc::Rc<dyn Fn(&AppRoute, &mut Window, &mut App)>;
 
-const NAV: [(AppRoute, IconName); 6] = [
-    (AppRoute::Dashboard, IconName::LayoutDashboard),
-    (AppRoute::Components, IconName::Frame),
-    (AppRoute::Playground, IconName::SquareTerminal),
-    (AppRoute::Data, IconName::File),
-    (AppRoute::Settings, IconName::Settings),
-    (AppRoute::Logs, IconName::Inbox),
+const NAV: [(AppRoute, &str); 6] = [
+    (AppRoute::Dashboard, "DB"),
+    (AppRoute::Components, "CP"),
+    (AppRoute::Playground, "PG"),
+    (AppRoute::Data, "DS"),
+    (AppRoute::Settings, "ST"),
+    (AppRoute::Logs, "LG"),
 ];
 
 pub fn render_icon_strip(
@@ -37,7 +37,7 @@ pub fn render_icon_strip(
         .gap_3()
         .child(app_mark(palette))
         .child(div().h(px(8.0)))
-        .children(NAV.into_iter().map(|(route, icon)| {
+        .children(NAV.into_iter().map(|(route, label)| {
             let is_active = current == route;
             let on_route_clone = on_route.clone();
 
@@ -50,18 +50,16 @@ pub fn render_icon_strip(
                 .justify_center()
                 .cursor_pointer()
                 .bg(if is_active {
-                    palette.active_background
+                    palette.logo_background
                 } else {
-                    palette.background
-                })
-                .border_1()
-                .border_color(if is_active {
-                    palette.active_border
-                } else {
-                    palette.background
+                    palette.hover_background
                 })
                 .hover({
-                    let hover = palette.hover_background;
+                    let hover = if is_active {
+                        palette.logo_background
+                    } else {
+                        palette.active_background
+                    };
                     move |mut style| {
                         style.background = Some(hover.into());
                         style
@@ -71,13 +69,15 @@ pub fn render_icon_strip(
                     on_route_clone(&route, window, cx);
                 })
                 .child(
-                    Icon::new(icon)
-                        .size_5()
+                    div()
+                        .text_xs()
+                        .font_weight(FontWeight::BOLD)
                         .text_color(if is_active {
-                            palette.active_foreground
+                            rgba(0xffffffff)
                         } else {
                             palette.foreground
-                        }),
+                        })
+                        .child(label),
                 )
         }))
         .child(div().flex_1())
@@ -118,7 +118,6 @@ struct RailPalette {
     foreground: Rgba,
     hover_background: Rgba,
     active_background: Rgba,
-    active_border: Rgba,
     active_foreground: Rgba,
     logo_background: Rgba,
 }
@@ -137,7 +136,6 @@ impl RailPalette {
                 foreground: rgba(0x8b949eff),
                 hover_background: rgba(0x161b22ff),
                 active_background: rgba(0x0d1117ff),
-                active_border: rgba(0x3fb950ff),
                 active_foreground: rgba(0x3fb950ff),
                 logo_background: rgba(0x238636ff),
             }
@@ -148,7 +146,6 @@ impl RailPalette {
                 foreground: rgba(0x57606aff),
                 hover_background: rgba(0xeaeef2ff),
                 active_background: rgba(0xffffffff),
-                active_border: rgba(0x0969daff),
                 active_foreground: rgba(0x0969daff),
                 logo_background: rgba(0x0969daff),
             }
