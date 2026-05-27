@@ -65,6 +65,7 @@ pub fn render_settings(
         )
 }
 
+#[allow(dead_code)]
 pub fn render_logs_page(state: &AppState) -> impl IntoElement {
     let palette = SettingsPalette::from_state(state);
     let mut panel = settings_panel("In-App Logs", palette)
@@ -284,6 +285,7 @@ fn render_performance_panel(
         )
 }
 
+#[allow(dead_code)]
 fn render_log_entry(entry: &UiLogEntry, palette: SettingsPalette) -> Div {
     div()
         .v_flex()

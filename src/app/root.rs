@@ -194,8 +194,9 @@ impl AppRoot {
             .collect()
     }
 }
+
 impl Render for AppRoot {
-    fn render(&mut self, _: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+    fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let available_themes = Self::get_available_themes(cx);
 
         // ── Column 1: narrow icon strip (48 px) ──────────────────────────────
@@ -210,7 +211,6 @@ impl Render for AppRoot {
         let nav = nav_panel::render_nav_panel(
             &self.state,
             cx.listener(|this, cat: &ComponentCategory, w, cx| {
-                // Ensure we're on the Components route when a category is clicked
                 if this.state.current_route != AppRoute::Components {
                     this.apply_route(AppRoute::Components, w, cx);
                 }
@@ -225,76 +225,82 @@ impl Render for AppRoot {
         );
 
         // ── Column 3: main content ────────────────────────────────────────────
+        let header_state = self.state.clone();
+        
         let main_content = div()
             .size_full()
             .v_flex()
-            .child(header::render_header(&self.state))
-            .child(div().flex_1().min_h(px(0.0)).overflow_y_scrollbar().child(content::render_content(
-                &self.state,
-                content::PlaygroundContentActions {
-                    on_preview_kind_select: cx.listener(
-                        |this, selected_indices: &Vec<usize>, window, cx| {
-                            this.apply_playground_preview_kind_selection(
-                                selected_indices.as_slice(),
+            .child(header::render_header(&header_state))
+            .child(div().flex_1().min_h(px(0.0)).overflow_y_scrollbar().child({
+                let state_ref = &self.state;
+                
+                content::render_content(
+                    state_ref,
+                    content::PlaygroundContentActions {
+                        on_preview_kind_select: cx.listener(
+                            |this, selected_indices: &Vec<usize>, window, cx| {
+                                this.apply_playground_preview_kind_selection(
+                                    selected_indices.as_slice(),
+                                    window,
+                                    cx,
+                                );
+                            },
+                        ),
+                        on_toggle_selected: cx.listener(|this, _: &ClickEvent, window, cx| {
+                            this.apply_playground_action(PlaygroundAction::ToggleSelected, window, cx);
+                        }),
+                        on_toggle_loading: cx.listener(|this, _: &ClickEvent, window, cx| {
+                            this.apply_playground_action(PlaygroundAction::ToggleLoading, window, cx);
+                        }),
+                        on_toggle_compact: cx.listener(|this, _: &ClickEvent, window, cx| {
+                            this.apply_playground_action(PlaygroundAction::ToggleCompact, window, cx);
+                        }),
+                        on_increase_intensity: cx.listener(|this, _: &ClickEvent, window, cx| {
+                            this.apply_playground_action(
+                                PlaygroundAction::IncreaseIntensity,
                                 window,
                                 cx,
                             );
-                        },
-                    ),
-                    on_toggle_selected: cx.listener(|this, _: &ClickEvent, window, cx| {
-                        this.apply_playground_action(PlaygroundAction::ToggleSelected, window, cx);
-                    }),
-                    on_toggle_loading: cx.listener(|this, _: &ClickEvent, window, cx| {
-                        this.apply_playground_action(PlaygroundAction::ToggleLoading, window, cx);
-                    }),
-                    on_toggle_compact: cx.listener(|this, _: &ClickEvent, window, cx| {
-                        this.apply_playground_action(PlaygroundAction::ToggleCompact, window, cx);
-                    }),
-                    on_increase_intensity: cx.listener(|this, _: &ClickEvent, window, cx| {
-                        this.apply_playground_action(
-                            PlaygroundAction::IncreaseIntensity,
-                            window,
-                            cx,
-                        );
-                    }),
-                    on_decrease_intensity: cx.listener(|this, _: &ClickEvent, window, cx| {
-                        this.apply_playground_action(
-                            PlaygroundAction::DecreaseIntensity,
-                            window,
-                            cx,
-                        );
-                    }),
-                },
-                content::SettingsContentActions {
-                    on_log_level_select: cx.listener(
-                        |this, selected_indices: &Vec<usize>, window, cx| {
-                            this.apply_log_level_selection(selected_indices.as_slice(), window, cx);
-                        },
-                    ),
-                    on_layout_density_select: cx.listener(
-                        |this, selected_indices: &Vec<usize>, window, cx| {
-                            this.apply_layout_density_selection(
-                                selected_indices.as_slice(),
+                        }),
+                        on_decrease_intensity: cx.listener(|this, _: &ClickEvent, window, cx| {
+                            this.apply_playground_action(
+                                PlaygroundAction::DecreaseIntensity,
                                 window,
                                 cx,
                             );
-                        },
-                    ),
-                    on_performance_mode_select: cx.listener(
-                        |this, selected_indices: &Vec<usize>, window, cx| {
-                            this.apply_performance_mode_selection(
-                                selected_indices.as_slice(),
-                                window,
-                                cx,
-                            );
-                        },
-                    ),
-                    on_theme_select: cx.listener(|this, theme_name: &SharedString, window, cx| {
-                        this.apply_theme(theme_name, window, cx);
-                    }),
-                },
-                available_themes,
-            )));
+                        }),
+                    },
+                    content::SettingsContentActions {
+                        on_log_level_select: cx.listener(
+                            |this, selected_indices: &Vec<usize>, window, cx| {
+                                this.apply_log_level_selection(selected_indices.as_slice(), window, cx);
+                            },
+                        ),
+                        on_layout_density_select: cx.listener(
+                            |this, selected_indices: &Vec<usize>, window, cx| {
+                                this.apply_layout_density_selection(
+                                    selected_indices.as_slice(),
+                                    window,
+                                    cx,
+                                );
+                            },
+                        ),
+                        on_performance_mode_select: cx.listener(
+                            |this, selected_indices: &Vec<usize>, window, cx| {
+                                this.apply_performance_mode_selection(
+                                    selected_indices.as_slice(),
+                                    window,
+                                    cx,
+                                );
+                            },
+                        ),
+                        on_theme_select: cx.listener(|this, theme_name: &SharedString, window, cx| {
+                            this.apply_theme(theme_name, window, cx);
+                        }),
+                    },
+                    available_themes,
+                )
+            }));
 
         div()
             .size_full()

@@ -1,4 +1,5 @@
 use crate::shared::logger::{AppLogLevel, LoggerRuntime};
+use crate::features::log_viewer::state::LogViewerState;
 use gpui::SharedString;
 
 const PLAYGROUND_LOG_LIMIT: usize = 8;
@@ -635,6 +636,7 @@ pub struct AppState {
     pub playground: PlaygroundState,
     pub settings: SettingsState,
     pub ui_logs: Vec<UiLogEntry>,
+    pub log_viewer: LogViewerState,
     pub status_message: String,
     pub sidebar_collapsed: bool,
     next_log_sequence: usize,
@@ -642,6 +644,9 @@ pub struct AppState {
 
 impl AppState {
     pub fn new() -> Self {
+        let mut log_viewer = LogViewerState::new();
+        log_viewer.load_log();
+        
         let mut state = Self {
             current_route: AppRoute::Components,
             selected_component_category: Some(ComponentCategory::Basic),
@@ -649,6 +654,7 @@ impl AppState {
             playground: PlaygroundState::new(),
             settings: SettingsState::default(),
             ui_logs: Vec::new(),
+            log_viewer,
             status_message: String::new(),
             sidebar_collapsed: false,
             next_log_sequence: 1,
@@ -762,6 +768,7 @@ impl AppState {
         self.status_message = self.compose_status_message();
     }
 
+    #[allow(dead_code)]
     pub fn route_title(&self) -> &'static str {
         self.current_route.title()
     }

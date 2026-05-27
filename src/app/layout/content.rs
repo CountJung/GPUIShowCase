@@ -1,7 +1,8 @@
 use gpui::*;
 
-use crate::features::{components, dashboard, data_showcase, playground, settings};
+use crate::features::{components, dashboard, data_showcase, log_viewer, playground, settings};
 use crate::shared::state::AppState;
+
 
 pub struct PlaygroundContentActions<
     OnPreviewKindSelect,
@@ -19,6 +20,7 @@ pub struct PlaygroundContentActions<
     pub on_decrease_intensity: OnDecreaseIntensity,
 }
 
+
 pub struct SettingsContentActions<
     OnLogLevelSelect,
     OnLayoutDensitySelect,
@@ -30,6 +32,7 @@ pub struct SettingsContentActions<
     pub on_performance_mode_select: OnPerformanceModeSelect,
     pub on_theme_select: OnThemeSelect,
 }
+
 
 pub fn render_content(
     state: &AppState,
@@ -49,6 +52,7 @@ pub fn render_content(
     >,
     available_themes: Vec<(gpui::SharedString, bool)>,
 ) -> impl IntoElement {
+    
     match state.current_route {
         crate::shared::state::AppRoute::Dashboard => {
             dashboard::render_dashboard(state).into_any_element()
@@ -79,7 +83,7 @@ pub fn render_content(
         )
         .into_any_element(),
         crate::shared::state::AppRoute::Logs => {
-            settings::render_logs_page(state).into_any_element()
+            log_viewer::widget::render_log_viewer(&mut state.log_viewer.clone()).into_any_element()
         }
     }
 }
