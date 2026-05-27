@@ -6,6 +6,7 @@ use gpui_component::{
 };
 
 use crate::app::layout::{content, header, nav_panel, sidebar};
+use crate::features::log_viewer::entry::LogLevel;
 use crate::shared::{
     logger::{self, AppLogLevel},
     state::{
@@ -186,6 +187,52 @@ impl AppRoot {
         }
     }
 
+    fn apply_log_viewer_date_select(
+        &mut self,
+        selected_indices: &[usize],
+        _: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
+        if let Some(idx) = selected_indices.first().copied() {
+            let dates = self.state.log_viewer.dates.clone();
+            if idx < dates.len() {
+                self.state.log_viewer.select_date(dates[idx].clone());
+                logger::emit_event(
+                    AppLogLevel::Info,
+                    "app.logs",
+                    format!("log date changed to {}", self.state.log_viewer.selected_date),
+                );
+                cx.notify();
+            }
+        }
+    }
+
+    fn apply_log_viewer_level_filter(
+        &mut self,
+        selected_indices: &[usize],
+        _: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
+        if let Some(idx) = selected_indices.first().copied() {
+            let level = match idx {
+                0 => None,
+                1 => Some(LogLevel::Error),
+                2 => Some(LogLevel::Warn),
+                3 => Some(LogLevel::Info),
+                4 => Some(LogLevel::Debug),
+                5 => Some(LogLevel::Trace),
+                _ => None,
+            };
+            self.state.log_viewer.set_level_filter(level);
+            logger::emit_event(
+                AppLogLevel::Info,
+                "app.logs",
+                format!("log level filter changed"),
+            );
+            cx.notify();
+        }
+    }
+
     fn get_available_themes(cx: &Context<Self>) -> Vec<(SharedString, bool)> {
         ThemeRegistry::global(cx)
             .sorted_themes()
@@ -232,10 +279,8 @@ impl Render for AppRoot {
             .v_flex()
             .child(header::render_header(&header_state))
             .child(div().flex_1().min_h(px(0.0)).overflow_y_scrollbar().child({
-                let state_ref = &self.state;
-                
                 content::render_content(
-                    state_ref,
+                    &self.state,
                     content::PlaygroundContentActions {
                         on_preview_kind_select: cx.listener(
                             |this, selected_indices: &Vec<usize>, window, cx| {
@@ -297,6 +342,18 @@ impl Render for AppRoot {
                         on_theme_select: cx.listener(|this, theme_name: &SharedString, window, cx| {
                             this.apply_theme(theme_name, window, cx);
                         }),
+                    },
+                    content::LogViewerContentActions {
+                        on_date_select: cx.listener(
+                            |this, selected_indices: &Vec<usize>, window, cx| {
+                                this.apply_log_viewer_date_select(selected_indices.as_slice(), window, cx);
+                            },
+                        ),
+                        on_level_filter: cx.listener(
+                            |this, selected_indices: &Vec<usize>, window, cx| {
+                                this.apply_log_viewer_level_filter(selected_indices.as_slice(), window, cx);
+                            },
+                        ),
                     },
                     available_themes,
                 )

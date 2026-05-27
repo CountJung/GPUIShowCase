@@ -1,13 +1,18 @@
 use crate::features::log_viewer::entry::{LogLevel, LogEntry};
 use crate::features::log_viewer::state::LogViewerState;
 use gpui::*;
+use gpui_component::Selectable as _;
 use gpui_component::StyledExt;
-use gpui_component::button::Button;
+use gpui_component::button::{Button, ButtonGroup};
 
 /// 로그 뷰어 위젯을 렌더링합니다.
-pub fn render_log_viewer(state: &mut LogViewerState) -> impl IntoElement {
+pub fn render_log_viewer(
+    state: &LogViewerState,
+    on_date_select: impl Fn(&Vec<usize>, &mut Window, &mut App) + 'static,
+    on_level_filter: impl Fn(&Vec<usize>, &mut Window, &mut App) + 'static,
+) -> impl IntoElement {
     let palette = LogPalette::from_theme(true); // Dark mode
-    
+
     div()
         .size_full()
         .v_flex()
@@ -15,23 +20,21 @@ pub fn render_log_viewer(state: &mut LogViewerState) -> impl IntoElement {
         .p_4()
         .bg(palette.background)
         .text_color(palette.foreground)
-        .child(render_toolbar(state, palette))
+        .child(render_toolbar(&state.dates, &state.selected_date, state.level_filter, on_date_select, on_level_filter))
         .child(render_log_list(state, palette))
 }
 
 /// 툴바(날짜 선택, 레벨 필터, 검색)를 렌더링합니다.
-fn render_toolbar(state: &mut LogViewerState, palette: LogPalette) -> Div {
-    let dates = state.dates.clone();
-    let selected_date = state.selected_date.clone();
-
-    // 날짜 선택기 생성
-    let date_picker = render_date_buttons(&dates, &selected_date);
-
-    // 레벨 필터 버튼  
-    let level_filters = render_level_buttons(state, palette);
-
-    // 검색창
-    let search_input = render_search_input(palette);
+fn render_toolbar(
+    dates: &[String],
+    selected_date: &str,
+    level_filter: Option<LogLevel>,
+    on_date_select: impl Fn(&Vec<usize>, &mut Window, &mut App) + 'static,
+    on_level_filter: impl Fn(&Vec<usize>, &mut Window, &mut App) + 'static,
+) -> Div {
+    let date_picker = render_date_buttons(dates, selected_date, on_date_select);
+    let level_filters = render_level_buttons(level_filter, on_level_filter);
+    let search_input = render_search_input();
 
     div()
         .h_flex()
@@ -44,8 +47,12 @@ fn render_toolbar(state: &mut LogViewerState, palette: LogPalette) -> Div {
         .child(search_input)
 }
 
-/// 날짜 선택 버튼들을 렌더링합니다.
-fn render_date_buttons(dates: &[String], selected: &str) -> Div {
+/// 날짜 선택 버튼 그룹을 렌더링합니다.
+fn render_date_buttons(
+    dates: &[String],
+    selected_date: &str,
+    on_date_select: impl Fn(&Vec<usize>, &mut Window, &mut App) + 'static,
+) -> Div {
     if dates.is_empty() {
         return div()
             .text_sm()
@@ -53,35 +60,32 @@ fn render_date_buttons(dates: &[String], selected: &str) -> Div {
             .child("로그 파일이 없습니다.");
     }
 
-    let mut container = div().h_flex().gap_1();
+    // 선택된 날짜의 인덱스 찾기
+    let selected_idx = dates.iter().position(|d| d == selected_date).unwrap_or(0);
+
+    let mut button_group = ButtonGroup::new("log-date-group")
+        .outline()
+        .compact();
 
     for (idx, date) in dates.iter().enumerate() {
-        let is_selected = *date == selected;
-        
-        let _is_selected = is_selected;
-        container = container.child(
+        let is_selected = idx == selected_idx;
+        button_group = button_group.child(
             Button::new(SharedString::from(format!("date-{}", idx)))
                 .label(date.clone())
-                .outline()
+                .selected(is_selected),
         );
     }
 
-    container
+    div().child(button_group.on_click(on_date_select))
 }
 
-/// 레벨 필터 버튼들을 렌더링합니다.
-fn render_level_buttons(state: &LogViewerState, _palette: LogPalette) -> Div {
-    let levels = [
-        ("전체", 0),
-        ("ERROR", 1),
-        ("WARN", 2),
-        ("INFO", 3),
-        ("DEBUG", 4),
-        ("TRACE", 5),
-    ];
-
+/// 레벨 필터 버튼 그룹을 렌더링합니다.
+fn render_level_buttons(
+    level_filter: Option<LogLevel>,
+    on_level_filter: impl Fn(&Vec<usize>, &mut Window, &mut App) + 'static,
+) -> Div {
     // 현재 선택된 레벨의 인덱스 찾기
-    let selected_idx = match state.level_filter {
+    let selected_idx = match level_filter {
         None => 0,
         Some(LogLevel::Error) => 1,
         Some(LogLevel::Warn) => 2,
@@ -91,24 +95,33 @@ fn render_level_buttons(state: &LogViewerState, _palette: LogPalette) -> Div {
         Some(LogLevel::Unknown) => 0,
     };
 
-    let mut container = div().h_flex().gap_1();
+    let levels = [
+        ("전체", 0usize),
+        ("ERROR", 1usize),
+        ("WARN", 2usize),
+        ("INFO", 3usize),
+        ("DEBUG", 4usize),
+        ("TRACE", 5usize),
+    ];
 
-    for (idx, (label, _)) in levels.iter().enumerate() {
-        let is_selected = idx == selected_idx;
-        
-        let _is_selected = is_selected;
-        container = container.child(
+    let mut button_group = ButtonGroup::new("log-level-group")
+        .outline()
+        .compact();
+
+    for (label, idx) in &levels {
+        let is_selected = *idx == selected_idx;
+        button_group = button_group.child(
             Button::new(SharedString::from(format!("level-{}", idx)))
                 .label(*label)
-                .outline()
+                .selected(is_selected),
         );
     }
 
-    container
+    div().child(button_group.on_click(on_level_filter))
 }
 
 /// 검색 입력창을 렌더링합니다.
-fn render_search_input(palette: LogPalette) -> Div {
+fn render_search_input() -> Div {
     div()
         .h_flex()
         .items_center()
@@ -117,10 +130,10 @@ fn render_search_input(palette: LogPalette) -> Div {
         .max_w(px(300.0))
         .p_2()
         .border_1()
-        .border_color(palette.border)
+        .border_color(rgba(0x30363dff))
         .rounded(px(6.0))
-        .bg(palette.panel_background)
-        .child(div().text_sm().text_color(palette.muted).child("로그 검색..."))
+        .bg(rgba(0x0d1117ff))
+        .child(div().text_sm().text_color(rgba(0x8b949eff)).child("로그 검색..."))
 }
 
 /// 로그 목록을 렌더링합니다.
@@ -266,4 +279,3 @@ impl LogPalette {
         }
     }
 }
-

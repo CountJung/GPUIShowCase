@@ -34,6 +34,12 @@ pub struct SettingsContentActions<
 }
 
 
+pub struct LogViewerContentActions<OnDateSelect, OnLevelFilter> {
+    pub on_date_select: OnDateSelect,
+    pub on_level_filter: OnLevelFilter,
+}
+
+
 pub fn render_content(
     state: &AppState,
     playground_actions: PlaygroundContentActions<
@@ -49,6 +55,10 @@ pub fn render_content(
         impl Fn(&Vec<usize>, &mut Window, &mut App) + 'static,
         impl Fn(&Vec<usize>, &mut Window, &mut App) + 'static,
         impl Fn(&gpui::SharedString, &mut Window, &mut App) + 'static,
+    >,
+    log_viewer_actions: LogViewerContentActions<
+        impl Fn(&Vec<usize>, &mut Window, &mut App) + 'static,
+        impl Fn(&Vec<usize>, &mut Window, &mut App) + 'static,
     >,
     available_themes: Vec<(gpui::SharedString, bool)>,
 ) -> impl IntoElement {
@@ -83,7 +93,11 @@ pub fn render_content(
         )
         .into_any_element(),
         crate::shared::state::AppRoute::Logs => {
-            log_viewer::widget::render_log_viewer(&mut state.log_viewer.clone()).into_any_element()
+            log_viewer::widget::render_log_viewer(
+                &state.log_viewer,
+                log_viewer_actions.on_date_select,
+                log_viewer_actions.on_level_filter,
+            ).into_any_element()
         }
     }
 }
